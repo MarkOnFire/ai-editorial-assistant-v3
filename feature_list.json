@@ -1,0 +1,112 @@
+[
+  {
+    "id": "2.1.1",
+    "name": "FastAPI project setup",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "cli-agent/gemini",
+    "description": "Create FastAPI app skeleton with CORS, health endpoints",
+    "files": ["api/main.py", "requirements.txt"],
+    "exit_criteria": ["FastAPI app runs", "Health endpoint returns OK"]
+  },
+  {
+    "id": "2.1.2",
+    "name": "Pydantic models for Job, Config, Events",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "cli-agent/gemini",
+    "description": "Define Pydantic models matching database schema",
+    "files": ["api/models/job.py", "api/models/config.py", "api/models/events.py"],
+    "exit_criteria": ["Models validate against existing SQLite schema"]
+  },
+  {
+    "id": "2.1.3",
+    "name": "Alembic setup for migrations",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "cli-agent/gemini",
+    "description": "Initialize Alembic for database migrations",
+    "files": ["alembic.ini", "alembic/"],
+    "exit_criteria": ["Alembic initialized", "Initial migration created"]
+  },
+  {
+    "id": "2.1.4",
+    "name": "Database service layer",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "orchestrator",
+    "description": "Create database connection management and basic CRUD operations",
+    "files": ["api/services/database.py"],
+    "exit_criteria": ["Thread-safe connections", "Basic job CRUD works"]
+  },
+  {
+    "id": "2.1.5",
+    "name": "Heartbeat mechanism for stale jobs",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "orchestrator",
+    "description": "Add last_heartbeat column, update during processing",
+    "files": ["api/services/database.py", "alembic/versions/"],
+    "exit_criteria": ["Jobs table has last_heartbeat", "Heartbeat updates during processing"]
+  },
+  {
+    "id": "2.1.6",
+    "name": "Auto-reset stuck jobs",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "orchestrator",
+    "description": "Detect and reset jobs stuck in processing >10 minutes",
+    "files": ["api/services/database.py"],
+    "exit_criteria": ["Stuck jobs auto-reset", "Reset logged to session_stats"]
+  },
+  {
+    "id": "2.1.7",
+    "name": "CI/CD pipeline skeleton",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "cli-agent/gemini",
+    "description": "GitHub Actions workflow for test/lint/build",
+    "files": [".github/workflows/ci.yml"],
+    "exit_criteria": ["Workflow runs on push", "Basic Python tests pass"]
+  },
+  {
+    "id": "2.1.8",
+    "name": "Structured logging utility",
+    "sprint": "2.1",
+    "status": "completed",
+    "agent": "cli-agent/gemini",
+    "description": "JSON logging with configurable levels",
+    "files": ["api/services/logging.py"],
+    "exit_criteria": ["Logs in JSON format", "Log level configurable"]
+  },
+  {
+    "id": "2.2.1",
+    "name": "Queue router",
+    "sprint": "2.2",
+    "status": "pending",
+    "agent": "orchestrator",
+    "description": "CRUD endpoints for queue management",
+    "files": ["api/routers/queue.py"],
+    "exit_criteria": ["GET/POST/DELETE queue endpoints work"]
+  },
+  {
+    "id": "2.2.2",
+    "name": "Jobs router",
+    "sprint": "2.2",
+    "status": "pending",
+    "agent": "orchestrator",
+    "description": "Job detail and control endpoints",
+    "files": ["api/routers/jobs.py"],
+    "exit_criteria": ["GET job details", "PATCH job status", "POST pause/resume/retry"]
+  },
+  {
+    "id": "2.2.3",
+    "name": "Step-level status tracking",
+    "sprint": "2.2",
+    "status": "pending",
+    "agent": "orchestrator",
+    "description": "Track completion of each agent phase independently",
+    "files": ["api/models/job.py", "api/services/database.py"],
+    "exit_criteria": ["JobPhase model exists", "Jobs can resume from last successful phase"]
+  }
+]

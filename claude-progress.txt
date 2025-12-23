@@ -1,0 +1,78 @@
+# Editorial Assistant v3.0 - Development Progress
+
+Last updated: 2025-12-23
+Current sprint: 2.2 (API Endpoints)
+
+## Sprint Status
+
+### Sprint 2.1: Foundation - COMPLETE
+- [x] 2.1.1 FastAPI project setup
+- [x] 2.1.2 Pydantic models
+- [x] 2.1.3 Alembic setup
+- [x] 2.1.4 Database service layer
+- [x] 2.1.5 Heartbeat mechanism
+- [x] 2.1.6 Auto-reset stuck jobs
+- [x] 2.1.7 CI/CD pipeline skeleton
+- [x] 2.1.8 Structured logging
+
+### Sprint 2.2: API Endpoints - PENDING
+- [ ] 2.2.1 Queue router
+- [ ] 2.2.2 Jobs router
+- [ ] 2.2.3 Step-level status tracking
+
+## Session Notes
+
+### 2025-12-23 - Sprint 2.1 Complete
+
+**All 8 Sprint 2.1 tasks completed:**
+
+1. **FastAPI Project Setup (2.1.1)**
+   - `api/main.py` with FastAPI app, CORS, health endpoint
+   - `/api/system/health` returns `{"status": "ok"}`
+
+2. **Pydantic Models (2.1.2)**
+   - `api/models/job.py` - JobStatus, Job, JobCreate, JobUpdate, JobList
+   - `api/models/events.py` - EventType, SessionEvent, EventCreate, EventData
+   - `api/models/config.py` - ConfigValueType, ConfigItem, ConfigCreate, ConfigUpdate
+
+3. **Alembic Setup (2.1.3)**
+   - `alembic.ini` configured for SQLite
+   - `alembic/versions/001_initial_schema.py` - jobs, session_stats, config tables
+   - Database created at `./dashboard.db`
+
+4. **Database Service Layer (2.1.4)**
+   - `api/services/database.py` - Async SQLAlchemy with connection pooling
+   - Full CRUD for jobs, events, config
+   - `get_next_pending_job()` for queue processing
+
+5. **Heartbeat Mechanism (2.1.5)**
+   - `alembic/versions/002_add_heartbeat.py` - Added last_heartbeat column
+   - `update_heartbeat(job_id)` - Updates timestamp during processing
+   - `get_stale_jobs(threshold_minutes)` - Finds jobs with stale heartbeats
+
+6. **Auto-reset Stuck Jobs (2.1.6)**
+   - `reset_stuck_jobs(threshold_minutes)` - Resets stuck jobs with retry logic
+   - Jobs exceeding max_retries marked as failed
+   - Events logged to session_stats for audit trail
+
+7. **CI/CD Pipeline (2.1.7)**
+   - `.github/workflows/ci.yml` - lint (ruff) + test (pytest)
+
+8. **Structured Logging (2.1.8)**
+   - `api/services/logging.py` - JSONFormatter, setup_logging(), get_logger()
+
+### 2024-12-23 - Initial Setup
+- Created v3.0 repo from scratch
+- Copied shared assets from v2.0 (agents, templates, config)
+- Scaffolded directory structure
+- Created feature_list.json with Sprint 2.1 tasks
+
+## Blockers
+None currently.
+
+## Decisions Made
+- OpenRouter preferred for model routing (simplicity)
+- Embedded chat deferred to v4.0
+- Claude Desktop handles copy-editor workflow in v3.0
+- Using SQLAlchemy 2.0+ async style with aiosqlite
+- JSON logging format for easier parsing

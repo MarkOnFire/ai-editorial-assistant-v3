@@ -1,0 +1,142 @@
+"""Integration tests to verify exit criteria for database service."""
+import pytest
+import pytest_asyncio
+import os
+import tempfile
+
+from api.services.database import (
+    init_db,
+    close_db,
+    create_job,
+    get_job,
+    update_job,
+)
+from api.models.job import JobCreate, JobUpdate, JobStatus
+
+
+@pytest_asyncio.fixture
+async def integration_db():
+    """Create a temporary test database for integration tests."""
+    fd, db_path = tempfile.mkstemp(suffix=".db")
+    os.close(fd)
+
+    os.environ["DATABASE_PATH"] = db_path
+
+    await init_db()
+
+    # Create schema
+    from api.services.database import metadata, _engine
+    async with _engine.begin() as conn:
+        await conn.run_sync(metadata.create_all)
+
+    yield db_path
+
+    await close_db()
+
+    try:
+        os.unlink(db_path)
+    except Exception:
+        pass
+
+
+@pytest.mark.asyncio
+async def test_exit_criteria_thread_safe_connections(integration_db):
+    """Verify thread-safe connections work (exit criteria 1)."""
+    import asyncio
+
+    async def create_test_job(i):
+        job = await create_job(JobCreate(
+            project_path=f"/projects/test{i}",
+            transcript_file=f"/transcripts/test{i}.txt",
+            priority=i,
+        ))
+        return job
+
+    # Create 20 jobs concurrently to test thread safety
+    jobs = await asyncio.gather(*[create_test_job(i) for i in range(20)])
+
+    # All jobs should be created successfully
+    assert len(jobs) == 20
+    assert all(job.id is not None for job in jobs)
+    assert all(job.status == JobStatus.pending for job in jobs)
+
+    print("PASS: Thread-safe connections work correctly")
+
+
+@pytest.mark.asyncio
+async def test_exit_criteria_basic_crud(integration_db):
+    """Verify basic job CRUD operations work (exit criteria 2)."""
+    # Create
+    job = await create_job(JobCreate(
+        project_path="/projects/test",
+        transcript_file="/transcripts/test.txt",
+        priority=5,
+    ))
+    assert job.id is not None
+    assert job.status == JobStatus.pending
+    print(f"CREATE: Job {job.id} created successfully")
+
+    # Read
+    retrieved = await get_job(job.id)
+    assert retrieved is not None
+    assert retrieved.id == job.id
+    assert retrieved.project_path == "/projects/test"
+    print(f"READ: Job {job.id} retrieved successfully")
+
+    # Update
+    updated = await update_job(job.id, JobUpdate(
+        status=JobStatus.in_progress,
+        current_phase="analyst",
+    ))
+    assert updated.status == JobStatus.in_progress
+    assert updated.current_phase == "analyst"
+    assert updated.started_at is not None
+    print(f"UPDATE: Job {job.id} updated successfully")
+
+    print("PASS: Basic job CRUD operations work correctly")
+
+
+@pytest.mark.asyncio
+async def test_exit_criteria_create_and_retrieve(integration_db):
+    """Verify can create and retrieve jobs (exit criteria 3)."""
+    # Create multiple jobs
+    job1 = await create_job(JobCreate(
+        project_path="/projects/episode1",
+        transcript_file="/transcripts/ep1.txt",
+        priority=10,
+    ))
+
+    job2 = await create_job(JobCreate(
+        project_path="/projects/episode2",
+        transcript_file="/transcripts/ep2.txt",
+        priority=5,
+    ))
+
+    job3 = await create_job(JobCreate(
+        project_path="/projects/episode3",
+        transcript_file="/transcripts/ep3.txt",
+        priority=1,
+    ))
+
+    # Retrieve all jobs
+    retrieved1 = await get_job(job1.id)
+    retrieved2 = await get_job(job2.id)
+    retrieved3 = await get_job(job3.id)
+
+    # Verify all retrieved correctly
+    assert retrieved1.project_path == "/projects/episode1"
+    assert retrieved2.project_path == "/projects/episode2"
+    assert retrieved3.project_path == "/projects/episode3"
+
+    assert retrieved1.priority == 10
+    assert retrieved2.priority == 5
+    assert retrieved3.priority == 1
+
+    # Verify defaults are set correctly
+    assert all(job.status == JobStatus.pending for job in [retrieved1, retrieved2, retrieved3])
+    assert all(job.agent_phases == ["analyst", "formatter"] for job in [retrieved1, retrieved2, retrieved3])
+    assert all(job.retry_count == 0 for job in [retrieved1, retrieved2, retrieved3])
+    assert all(job.max_retries == 3 for job in [retrieved1, retrieved2, retrieved3])
+
+    print(f"PASS: Created and retrieved {len([job1, job2, job3])} jobs successfully")
+    print("All exit criteria met!")

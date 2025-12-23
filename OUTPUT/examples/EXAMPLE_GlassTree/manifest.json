@@ -1,0 +1,23 @@
+{
+  "transcript_file": "EXAMPLE_GlassTree_ForClaude.txt",
+  "project_name": "EXAMPLE_GlassTree",
+  "program_type": "Wisconsin Life",
+  "processing_started": "2025-01-15T10:30:00Z",
+  "status": "ready_for_editing",
+  "deliverables": {
+    "brainstorming": {
+      "file": "brainstorming.md",
+      "created": "2025-01-15T10:35:00Z",
+      "agent": "transcript-analyst"
+    },
+    "formatted_transcript": {
+      "file": "formatted_transcript.md",
+      "created": "2025-01-15T10:35:00Z",
+      "agent": "formatter"
+    },
+    "timestamps": null,
+    "keywords": null
+  },
+  "processing_completed": "2025-01-15T10:35:00Z",
+  "_note": "This is an example project demonstrating the expected output structure"
+}

@@ -1,0 +1,96 @@
+{
+  "primary_backend": "openrouter",
+  "fallback_backend": "openrouter",
+
+  "backends": {
+    "local-ollama": {
+      "type": "ollama",
+      "endpoint": "http://localhost:11434",
+      "model": "qwen2.5:14b",
+      "timeout": 180,
+      "cost_per_project": 0.00,
+      "enabled": false
+    },
+    "remote-ollama": {
+      "type": "ollama",
+      "endpoint": "http://192.168.1.100:11434",
+      "model": "qwen2.5:14b",
+      "timeout": 180,
+      "cost_per_project": 0.00,
+      "enabled": false
+    },
+    "openai-mini": {
+      "type": "openai",
+      "endpoint": "https://api.openai.com/v1/chat/completions",
+      "model": "gpt-4o-mini",
+      "api_key_env": "OPENAI_API_KEY",
+      "timeout": 180,
+      "cost_per_project": 0.012,
+      "enabled": false
+    },
+    "openai": {
+      "type": "openai",
+      "endpoint": "https://api.openai.com/v1/chat/completions",
+      "model": "gpt-4o",
+      "api_key_env": "OPENAI_API_KEY",
+      "timeout": 180,
+      "cost_per_project": 0.20,
+      "enabled": false
+    },
+    "claude": {
+      "type": "anthropic",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-5-sonnet-latest",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "timeout": 180,
+      "cost_per_project": 0.25,
+      "enabled": false
+    },
+    "gemini-flash": {
+      "type": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+      "model": "gemini-1.5-flash",
+      "api_key_env": "GEMINI_API_KEY",
+      "timeout": 180,
+      "cost_per_project": 0.015
+    },
+    "gemini-flash-8b": {
+      "type": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent",
+      "model": "gemini-1.5-flash-8b",
+      "api_key_env": "GEMINI_API_KEY",
+      "timeout": 180,
+      "cost_per_project": 0.008
+    },
+    "gemini-pro": {
+      "type": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+      "model": "gemini-1.5-pro",
+      "api_key_env": "GEMINI_API_KEY",
+      "timeout": 240,
+      "cost_per_project": 0.08
+    },
+    "openrouter": {
+      "type": "openrouter",
+      "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+      "model": "google/gemini-2.5-flash",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "timeout": 180,
+      "cost_per_project": 0.02
+    }
+  },
+
+  "auto_select": {
+    "enabled": true,
+    "preference_order": [
+      "openrouter"
+    ],
+    "check_interval_seconds": 5
+  },
+
+  "processing": {
+    "check_queue_interval_seconds": 300,
+    "batch_size": 4,
+    "parallel_processing": false
+  }
+}
