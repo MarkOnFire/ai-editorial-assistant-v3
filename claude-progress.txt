@@ -1,7 +1,7 @@
 # Editorial Assistant v3.0 - Development Progress
 
 Last updated: 2025-12-29
-Current sprint: 3.1 (Web Dashboard Foundation)
+Current sprint: 4.1 (Agent Prompts & Job Worker) - COMPLETE
 
 ## Sprint Status
 
@@ -24,11 +24,53 @@ Current sprint: 3.1 (Web Dashboard Foundation)
 - [x] 2.2.6 Cost cap and model allowlist safety guards
 - [x] 2.2.7 Timezone-aware datetime helpers
 
-### Sprint 3.1: Web Dashboard Foundation - IN PROGRESS
+### Sprint 3.1: Web Dashboard Foundation - COMPLETE
 - [x] 3.1.0 React + Vite + Tailwind scaffold
 - [x] 3.1.1 Dashboard: Active model/preset display
 
+### Sprint 4.1: Agent Prompts & Job Worker - COMPLETE
+- [x] Job processing worker (polls queue, runs phases, calls LLM)
+- [x] Agent system prompts (analyst, formatter, seo, copy_editor)
+- [x] 4.1.1 Claude Desktop Airtable SST integration
+- [x] 4.1.2 needs_review flag handling
+- [x] 4.1.3 Inline revision reports
+
 ## Session Notes
+
+### 2025-12-29 - Sprint 4.1 COMPLETE (Agent Prompts & Job Worker)
+
+**Tasks completed:**
+
+1. **Job Processing Worker** - `api/services/worker.py`, `run_worker.py`
+   - JobWorker class polls queue, processes jobs through 4 phases
+   - Phases: analyst -> formatter -> seo -> copy_editor
+   - Uses phase_backends config for per-phase model selection
+   - Heartbeat tracking prevents stale job detection
+   - Creates manifest.json on completion with cost/token tracking
+   - CLI entry point with configurable poll/heartbeat intervals
+
+2. **Agent System Prompts** - `.claude/agents/`
+   - `analyst.md` - Transcript analysis, theme extraction, keyword research
+   - `formatter.md` - Raw-to-clean transcript formatting, needs_review workflow
+   - `seo.md` - SEO metadata optimization, platform-specific recommendations
+   - `copy_editor.md` - Airtable MCP integration, inline revision reports
+
+3. **Sprint 4.1 Documentation Tasks**
+   - 4.1.1: Airtable SST integration (READ-ONLY MCP, screenshot workflow)
+   - 4.1.2: needs_review flag handling (proactive detection and resolution)
+   - 4.1.3: Inline revision reports (no file saves, copy-ready output)
+
+**Key features in agent prompts:**
+- Airtable MCP integration (read-only) for live metadata lookup
+- needs_review workflow with hidden markers and Review Notes section
+- Inline revision reports with side-by-side comparisons
+- PBS style guidelines (AP Style, character limits, tone)
+- Platform-specific SEO (YouTube, PBS App, social media)
+
+**Ready to test:**
+- `./venv/bin/python run_worker.py` to start job processing
+- Create Claude Desktop project with copy_editor.md instructions
+- Add transcript to queue via API and watch worker process
 
 ### 2025-12-29 - Sprint 3.1 Started (Web Dashboard)
 
