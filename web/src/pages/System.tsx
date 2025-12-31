@@ -46,25 +46,31 @@ const AGENT_INFO: AgentInfo[] = [
     id: 'analyst',
     name: 'Analyst',
     icon: '🔍',
-    description: 'Analyzes raw transcripts to identify key topics, themes, speakers, and structural elements. Produces a detailed analysis document that guides downstream agents.'
+    description: 'Analyzes raw transcripts to identify key topics, themes, speakers and structural elements. Produces a detailed analysis document that guides downstream agents.'
   },
   {
     id: 'formatter',
     name: 'Formatter',
     icon: '📝',
-    description: 'Transforms raw transcripts into clean, readable markdown. Handles speaker attribution, paragraph breaks, timestamps, and basic structural formatting.'
+    description: 'Transforms raw transcripts into clean, readable markdown. Handles speaker attribution, paragraph breaks, timestamps and basic structural formatting.'
   },
   {
     id: 'seo',
     name: 'SEO Specialist',
     icon: '🎯',
-    description: 'Generates search-optimized metadata including titles, descriptions, tags, and keywords. Optimizes for streaming platform discovery and search rankings.'
+    description: 'Generates search-optimized metadata including titles, descriptions, tags and keywords. Optimizes for streaming platform discovery and search rankings.'
+  },
+  {
+    id: 'manager',
+    name: 'QA Manager',
+    icon: '✅',
+    description: 'Reviews all automated outputs for quality before completion. Audits cheaper model work and flags issues. Always runs on big-brain tier for oversight.'
   },
   {
     id: 'copy_editor',
     name: 'Copy Editor',
     icon: '✏️',
-    description: 'Reviews and refines formatted content for clarity, grammar, and PBS style guidelines. Ensures broadcast-quality prose while preserving speaker voice.'
+    description: 'Reviews and refines formatted content for clarity, grammar and PBS style guidelines. Ensures broadcast-quality prose while preserving speaker voice.'
   }
 ]
 
@@ -119,7 +125,7 @@ export default function System() {
       <h1 className="text-2xl font-bold text-white">System Status</h1>
 
       {/* Connection Status Card */}
-      <div className={`rounded-lg border p-6 ${
+      <div role={isConnected ? "status" : "alert"} aria-live={isConnected ? "polite" : "assertive"} className={`rounded-lg border p-6 ${
         isConnected
           ? 'bg-green-900/20 border-green-500/30'
           : 'bg-red-900/20 border-red-500/30'
@@ -288,20 +294,25 @@ export default function System() {
               <span>↗</span>
             </a>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {Object.entries(health.llm.openrouter_presets).map(([presetName, preset]) => {
               const isBigBrain = presetName.includes('big-brain')
+              const isCheapskate = presetName.includes('cheapskate')
+              const colorClass = isBigBrain
+                ? 'bg-purple-900/10 border-purple-500/30'
+                : isCheapskate
+                ? 'bg-green-900/10 border-green-500/30'
+                : 'bg-cyan-900/10 border-cyan-500/30'
+              const textClass = isBigBrain
+                ? 'text-purple-400'
+                : isCheapskate
+                ? 'text-green-400'
+                : 'text-cyan-400'
               return (
-                <div key={presetName} className={`rounded-lg p-3 border ${
-                  isBigBrain
-                    ? 'bg-purple-900/10 border-purple-500/30'
-                    : 'bg-cyan-900/10 border-cyan-500/30'
-                }`}>
+                <div key={presetName} className={`rounded-lg p-3 border ${colorClass}`}>
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className={`text-sm font-medium ${
-                      isBigBrain ? 'text-purple-400' : 'text-cyan-400'
-                    }`}>
-                      {presetName}
+                    <span className={`text-sm font-medium ${textClass}`}>
+                      {presetName.replace('ai-editorial-assistant-', '').replace('ai-editorial-assistant', 'default')}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 mb-2">{preset.description}</p>
@@ -333,6 +344,13 @@ export default function System() {
             {AGENT_INFO.map((agent) => {
               const backend = health.llm?.phase_backends?.[agent.id] || 'openrouter'
               const isBigBrain = backend.includes('big-brain')
+              const isCheapskate = backend.includes('cheapskate')
+              const badgeClass = isBigBrain
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                : isCheapskate
+                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+              const tierLabel = isBigBrain ? 'big-brain' : isCheapskate ? 'cheapskate' : 'default'
               return (
                 <div key={agent.id} className="flex items-start space-x-4 p-3 bg-gray-900 rounded-lg">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-lg">
@@ -341,12 +359,8 @@ export default function System() {
                   <div className="flex-grow min-w-0">
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-white">{agent.name}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        isBigBrain
-                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                          : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                      }`}>
-                        {isBigBrain ? 'big-brain' : 'default'}
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${badgeClass}`}>
+                        {tierLabel}
                       </span>
                     </div>
                     <p className="text-sm text-gray-400 mt-1">{agent.description}</p>
@@ -356,8 +370,9 @@ export default function System() {
             })}
           </div>
           <p className="text-xs text-gray-500 mt-3">
-            <span className="text-purple-400">big-brain</span> = complex reasoning preset |{' '}
-            <span className="text-cyan-400">default</span> = general use preset
+            <span className="text-purple-400">big-brain</span> = complex reasoning |{' '}
+            <span className="text-cyan-400">default</span> = balanced |{' '}
+            <span className="text-green-400">cheapskate</span> = free tier
           </p>
         </div>
       )}

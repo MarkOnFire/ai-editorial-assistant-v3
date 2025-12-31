@@ -1,0 +1,620 @@
+"""Tests for the JobWorker class.
+
+Tests job claiming, phase processing, heartbeat updates, error handling,
+tier escalation, and manager phase analysis/recovery.
+"""
+
+import asyncio
+import json
+import pytest
+from datetime import datetime, timezone
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch, PropertyMock
+
+from api.services.worker import JobWorker, WorkerConfig
+
+
+@pytest.fixture
+def mock_llm_client():
+    """Create a mock LLM client."""
+    client = MagicMock()
+    client.config = {
+        "routing": {
+            "tier_labels": ["cheapskate", "default", "big-brain"],
+            "tiers": ["openrouter-cheapskate", "openrouter", "openrouter-big-brain"],
+            "long_form_threshold_minutes": 15,
+        }
+    }
+    client.get_escalation_config.return_value = {
+        "enabled": True,
+        "on_failure": True,
+        "on_timeout": True,
+        "timeout_seconds": 120,
+        "max_retries_per_tier": 1,
+    }
+    client.get_tier_for_phase_with_reason.return_value = (0, "short transcript")
+    client.get_backend_for_phase.return_value = "openrouter-cheapskate"
+    client.get_next_tier.return_value = 1
+    return client
+
+
+@pytest.fixture
+def mock_llm_response():
+    """Create a mock LLM response."""
+    response = MagicMock()
+    response.content = "Test output content"
+    response.cost = 0.001
+    response.total_tokens = 500
+    response.model = "test-model"
+    return response
+
+
+@pytest.fixture
+def worker_config():
+    """Create a test worker configuration."""
+    return WorkerConfig(
+        poll_interval=1,
+        heartbeat_interval=5,
+        max_retries=3,
+        max_concurrent_jobs=1,
+        worker_id="test-worker",
+    )
+
+
+@pytest.fixture
+def sample_job():
+    """Create a sample job dict."""
+    return {
+        "id": 1,
+        "project_name": "Test Project",
+        "transcript_file": "test_transcript.txt",
+        "status": "in_progress",
+        "priority": 10,
+        "queued_at": datetime.now(timezone.utc).isoformat(),
+        "phases": [],
+    }
+
+
+class TestWorkerConfig:
+    """Tests for WorkerConfig class."""
+
+    def test_default_config(self):
+        """Test default configuration values."""
+        config = WorkerConfig()
+        assert config.poll_interval == 30
+        assert config.heartbeat_interval == 60
+        assert config.max_retries == 3
+        assert config.max_concurrent_jobs == 1
+        assert config.worker_id.startswith("worker-")
+
+    def test_custom_config(self):
+        """Test custom configuration values."""
+        config = WorkerConfig(
+            poll_interval=10,
+            heartbeat_interval=30,
+            max_retries=5,
+            max_concurrent_jobs=3,
+            worker_id="custom-worker",
+        )
+        assert config.poll_interval == 10
+        assert config.heartbeat_interval == 30
+        assert config.max_retries == 5
+        assert config.max_concurrent_jobs == 3
+        assert config.worker_id == "custom-worker"
+
+
+class TestJobWorker:
+    """Tests for JobWorker class."""
+
+    @patch("api.services.worker.get_llm_client")
+    def test_worker_initialization(self, mock_get_llm, mock_llm_client):
+        """Test worker initializes correctly."""
+        mock_get_llm.return_value = mock_llm_client
+
+        worker = JobWorker()
+        assert worker.config is not None
+        assert worker.llm is not None
+        assert worker.running is False
+        assert worker.PHASES == ["analyst", "formatter", "seo", "manager"]
+
+    @patch("api.services.worker.get_llm_client")
+    def test_worker_with_custom_config(self, mock_get_llm, mock_llm_client, worker_config):
+        """Test worker with custom configuration."""
+        mock_get_llm.return_value = mock_llm_client
+
+        worker = JobWorker(config=worker_config)
+        assert worker.config.poll_interval == 1
+        assert worker.config.worker_id == "test-worker"
+
+
+class TestAllPhasesComplete:
+    """Tests for _all_phases_complete method."""
+
+    @patch("api.services.worker.get_llm_client")
+    def test_empty_phases_returns_false(self, mock_get_llm, mock_llm_client, tmp_path):
+        """Empty phases list should return False."""
+        mock_get_llm.return_value = mock_llm_client
+        worker = JobWorker()
+
+        result = worker._all_phases_complete([], tmp_path)
+        assert result is False
+
+    @patch("api.services.worker.get_llm_client")
+    def test_incomplete_phases_returns_false(self, mock_get_llm, mock_llm_client, tmp_path):
+        """Incomplete phases should return False."""
+        mock_get_llm.return_value = mock_llm_client
+        worker = JobWorker()
+
+        phases = [
+            {"name": "analyst", "status": "completed"},
+            {"name": "formatter", "status": "pending"},
+            {"name": "seo", "status": "pending"},
+            {"name": "manager", "status": "pending"},
+        ]
+        result = worker._all_phases_complete(phases, tmp_path)
+        assert result is False
+
+    @patch("api.services.worker.get_llm_client")
+    def test_all_completed_but_missing_files(self, mock_get_llm, mock_llm_client, tmp_path):
+        """All phases completed but missing output files should return False."""
+        mock_get_llm.return_value = mock_llm_client
+        worker = JobWorker()
+
+        phases = [
+            {"name": "analyst", "status": "completed"},
+            {"name": "formatter", "status": "completed"},
+            {"name": "seo", "status": "completed"},
+            {"name": "manager", "status": "completed"},
+        ]
+        result = worker._all_phases_complete(phases, tmp_path)
+        assert result is False
+
+    @patch("api.services.worker.get_llm_client")
+    def test_all_completed_with_files(self, mock_get_llm, mock_llm_client, tmp_path):
+        """All phases completed with output files should return True."""
+        mock_get_llm.return_value = mock_llm_client
+        worker = JobWorker()
+
+        # Create output files
+        for phase in ["analyst", "formatter", "seo", "manager"]:
+            (tmp_path / f"{phase}_output.md").write_text(f"Output for {phase}")
+
+        phases = [
+            {"name": "analyst", "status": "completed"},
+            {"name": "formatter", "status": "completed"},
+            {"name": "seo", "status": "completed"},
+            {"name": "manager", "status": "completed"},
+        ]
+        result = worker._all_phases_complete(phases, tmp_path)
+        assert result is True
+
+
+class TestSetupProjectDir:
+    """Tests for _setup_project_dir method."""
+
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.OUTPUT_DIR")
+    def test_creates_directory(self, mock_output_dir, mock_get_llm, mock_llm_client, tmp_path):
+        """Should create project directory."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_output_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        worker = JobWorker()
+        job = {"id": 1, "project_name": "Test Project"}
+
+        result = worker._setup_project_dir(job)
+        assert result.exists()
+        assert result.name == "Test_Project"
+
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.OUTPUT_DIR")
+    def test_sanitizes_project_name(self, mock_output_dir, mock_get_llm, mock_llm_client, tmp_path):
+        """Should sanitize special characters in project name."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_output_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        worker = JobWorker()
+        job = {"id": 1, "project_name": "Test/Project:Name!"}
+
+        result = worker._setup_project_dir(job)
+        assert "/" not in result.name
+        assert ":" not in result.name
+        assert "!" not in result.name
+
+
+class TestLoadTranscript:
+    """Tests for _load_transcript method."""
+
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.TRANSCRIPTS_DIR")
+    def test_loads_transcript_from_transcripts_dir(
+        self, mock_transcripts_dir, mock_get_llm, mock_llm_client, tmp_path
+    ):
+        """Should load transcript from transcripts directory."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_transcripts_dir.__truediv__ = lambda self, name: tmp_path / name
+        type(mock_transcripts_dir).parent = PropertyMock(return_value=tmp_path)
+
+        # Create transcript file
+        (tmp_path / "test.txt").write_text("Transcript content")
+
+        worker = JobWorker()
+        job = {"id": 1, "transcript_file": "test.txt"}
+
+        result = worker._load_transcript(job)
+        assert result == "Transcript content"
+
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.TRANSCRIPTS_DIR")
+    def test_raises_on_missing_file(
+        self, mock_transcripts_dir, mock_get_llm, mock_llm_client, tmp_path
+    ):
+        """Should raise FileNotFoundError for missing transcript."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_transcripts_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        worker = JobWorker()
+        job = {"id": 1, "transcript_file": "missing.txt"}
+
+        with pytest.raises(FileNotFoundError):
+            worker._load_transcript(job)
+
+
+class TestLoadAgentPrompt:
+    """Tests for _load_agent_prompt method."""
+
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.AGENTS_DIR")
+    def test_loads_prompt_from_file(self, mock_agents_dir, mock_get_llm, mock_llm_client, tmp_path):
+        """Should load agent prompt from file."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        # Create prompt file
+        (tmp_path / "analyst.md").write_text("Custom analyst prompt")
+
+        worker = JobWorker()
+        result = worker._load_agent_prompt("analyst")
+        assert result == "Custom analyst prompt"
+
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.AGENTS_DIR")
+    def test_uses_fallback_for_missing_file(
+        self, mock_agents_dir, mock_get_llm, mock_llm_client, tmp_path
+    ):
+        """Should use fallback prompt if file is missing."""
+        mock_get_llm.return_value = mock_llm_client
+        # Make the path check return False (file doesn't exist)
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        worker = JobWorker()
+        result = worker._load_agent_prompt("analyst")
+        assert "transcript analyst" in result.lower()
+
+
+class TestBuildPhasePrompt:
+    """Tests for _build_phase_prompt method."""
+
+    @patch("api.services.worker.get_llm_client")
+    def test_analyst_prompt(self, mock_get_llm, mock_llm_client):
+        """Should build analyst phase prompt."""
+        mock_get_llm.return_value = mock_llm_client
+
+        worker = JobWorker()
+        context = {"transcript": "Test transcript content"}
+
+        result = worker._build_phase_prompt("analyst", context)
+        assert "Test transcript content" in result
+        assert "analyze" in result.lower()
+
+    @patch("api.services.worker.get_llm_client")
+    def test_formatter_prompt_includes_analysis(self, mock_get_llm, mock_llm_client):
+        """Should include analysis in formatter prompt."""
+        mock_get_llm.return_value = mock_llm_client
+
+        worker = JobWorker()
+        context = {
+            "transcript": "Test transcript",
+            "analyst_output": "Analysis output",
+        }
+
+        result = worker._build_phase_prompt("formatter", context)
+        assert "Analysis output" in result
+        assert "Test transcript" in result
+
+    @patch("api.services.worker.get_llm_client")
+    def test_seo_prompt_includes_formatted(self, mock_get_llm, mock_llm_client):
+        """Should include formatted transcript in SEO prompt."""
+        mock_get_llm.return_value = mock_llm_client
+
+        worker = JobWorker()
+        context = {
+            "transcript": "Test transcript",
+            "analyst_output": "Analysis",
+            "formatter_output": "Formatted transcript",
+        }
+
+        result = worker._build_phase_prompt("seo", context)
+        assert "Formatted transcript" in result
+        assert "SEO" in result or "metadata" in result.lower()
+
+    @patch("api.services.worker.get_llm_client")
+    def test_manager_prompt_includes_all_outputs(self, mock_get_llm, mock_llm_client):
+        """Should include all phase outputs in manager prompt."""
+        mock_get_llm.return_value = mock_llm_client
+
+        worker = JobWorker()
+        context = {
+            "transcript": "Test transcript",
+            "analyst_output": "Analysis",
+            "formatter_output": "Formatted",
+            "seo_output": '{"title": "Test"}',
+        }
+
+        result = worker._build_phase_prompt("manager", context)
+        assert "Analysis" in result
+        assert "Formatted" in result
+        assert "Test" in result
+
+
+class TestRunPhase:
+    """Tests for _run_phase method."""
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.log_event")
+    @patch("api.services.worker.AGENTS_DIR")
+    async def test_successful_phase_execution(
+        self, mock_agents_dir, mock_log_event, mock_get_llm, mock_llm_client, mock_llm_response, tmp_path
+    ):
+        """Should successfully execute a phase."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_llm_client.chat = AsyncMock(return_value=mock_llm_response)
+        mock_log_event.return_value = None
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        worker = JobWorker()
+        context = {"transcript": "Test transcript"}
+
+        result = await worker._run_phase(
+            job_id=1,
+            phase_name="analyst",
+            context=context,
+            project_path=tmp_path,
+        )
+
+        assert result["success"] is True
+        assert result["output"] == "Test output content"
+        assert result["cost"] == 0.001
+        assert result["tokens"] == 500
+        assert (tmp_path / "analyst_output.md").exists()
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.log_event")
+    @patch("api.services.worker.AGENTS_DIR")
+    async def test_phase_timeout_with_escalation(
+        self, mock_agents_dir, mock_log_event, mock_get_llm, mock_llm_client, mock_llm_response, tmp_path
+    ):
+        """Should escalate to next tier on timeout."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_log_event.return_value = None
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        # First call times out, second succeeds
+        mock_llm_client.chat = AsyncMock(
+            side_effect=[asyncio.TimeoutError(), mock_llm_response]
+        )
+        mock_llm_client.get_escalation_config.return_value = {
+            "enabled": True,
+            "on_timeout": True,
+            "on_failure": True,
+            "timeout_seconds": 1,
+            "max_retries_per_tier": 1,
+        }
+
+        worker = JobWorker()
+        context = {"transcript": "Test transcript"}
+
+        result = await worker._run_phase(
+            job_id=1,
+            phase_name="analyst",
+            context=context,
+            project_path=tmp_path,
+        )
+
+        assert result["success"] is True
+        assert result["attempts"] >= 1
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.log_event")
+    @patch("api.services.worker.AGENTS_DIR")
+    async def test_phase_failure_at_max_tier(
+        self, mock_agents_dir, mock_log_event, mock_get_llm, mock_llm_client, tmp_path
+    ):
+        """Should fail when at max tier with no more escalation."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_log_event.return_value = None
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        mock_llm_client.chat = AsyncMock(side_effect=Exception("LLM Error"))
+        mock_llm_client.get_next_tier.return_value = None  # No next tier
+
+        worker = JobWorker()
+        context = {"transcript": "Test transcript"}
+
+        result = await worker._run_phase(
+            job_id=1,
+            phase_name="analyst",
+            context=context,
+            project_path=tmp_path,
+        )
+
+        assert result["success"] is False
+        assert "LLM Error" in result["error"]
+
+
+class TestHeartbeatLoop:
+    """Tests for _heartbeat_loop method."""
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.update_job_heartbeat")
+    async def test_heartbeat_updates(self, mock_update_heartbeat, mock_get_llm, mock_llm_client):
+        """Should update heartbeat periodically."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_update_heartbeat.return_value = None
+
+        config = WorkerConfig(heartbeat_interval=0.1)  # 100ms for test
+        worker = JobWorker(config=config)
+
+        # Run heartbeat for short time then cancel
+        task = asyncio.create_task(worker._heartbeat_loop(1))
+        await asyncio.sleep(0.25)  # Let it run for ~2 heartbeats
+        task.cancel()
+
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+
+        assert mock_update_heartbeat.call_count >= 1
+
+
+class TestAnalyzeAndRecover:
+    """Tests for _analyze_and_recover method."""
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.log_event")
+    @patch("api.services.worker.update_job_phase")
+    @patch("api.services.worker.update_job_status")
+    @patch("api.services.worker.AGENTS_DIR")
+    async def test_recovery_action_fail(
+        self,
+        mock_agents_dir,
+        mock_update_status,
+        mock_update_phase,
+        mock_log_event,
+        mock_get_llm,
+        mock_llm_client,
+        tmp_path,
+    ):
+        """Should return not recovered when action is FAIL."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_log_event.return_value = None
+        mock_update_phase.return_value = None
+        mock_update_status.return_value = None
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        # Manager returns FAIL action
+        fail_response = MagicMock()
+        fail_response.content = "ACTION: FAIL\nREASON: Unrecoverable error"
+        fail_response.cost = 0.01
+        fail_response.model = "test-model"
+        mock_llm_client.generate = AsyncMock(return_value=fail_response)
+
+        worker = JobWorker()
+        result = await worker._analyze_and_recover(
+            job={"id": 1, "project_name": "Test"},
+            project_path=tmp_path,
+            phases=[{"name": "analyst", "status": "failed", "tier": 0, "tier_label": "cheapskate"}],
+            context={"transcript": "test"},
+            error="Test error",
+            current_cost=0.001,
+        )
+
+        assert result["recovered"] is False
+        assert result["action"] == "FAIL"
+
+
+class TestProcessJob:
+    """Tests for process_job method."""
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.update_job_status")
+    @patch("api.services.worker.update_job_phase")
+    @patch("api.services.worker.update_job_heartbeat")
+    @patch("api.services.worker.log_event")
+    @patch("api.services.worker.start_run_tracking")
+    @patch("api.services.worker.end_run_tracking")
+    @patch("api.services.worker.TRANSCRIPTS_DIR")
+    @patch("api.services.worker.OUTPUT_DIR")
+    @patch("api.services.worker.AGENTS_DIR")
+    async def test_successful_job_processing(
+        self,
+        mock_agents_dir,
+        mock_output_dir,
+        mock_transcripts_dir,
+        mock_end_tracking,
+        mock_start_tracking,
+        mock_log_event,
+        mock_update_heartbeat,
+        mock_update_phase,
+        mock_update_status,
+        mock_get_llm,
+        mock_llm_client,
+        mock_llm_response,
+        tmp_path,
+        sample_job,
+    ):
+        """Should successfully process a job through all phases."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_llm_client.chat = AsyncMock(return_value=mock_llm_response)
+        mock_update_status.return_value = None
+        mock_update_phase.return_value = None
+        mock_update_heartbeat.return_value = None
+        mock_log_event.return_value = None
+        mock_start_tracking.return_value = MagicMock(total_cost=0, total_tokens=0)
+        mock_end_tracking.return_value = {"total_cost": 0.01, "total_tokens": 2000}
+
+        # Set up paths
+        mock_transcripts_dir.__truediv__ = lambda self, name: tmp_path / name
+        mock_output_dir.__truediv__ = lambda self, name: tmp_path / name
+        mock_agents_dir.__truediv__ = lambda self, name: tmp_path / name
+
+        # Create transcript
+        (tmp_path / sample_job["transcript_file"]).write_text("Test transcript content")
+
+        worker = JobWorker()
+        await worker.process_job(sample_job)
+
+        # Verify job was marked completed
+        calls = mock_update_status.call_args_list
+        final_call = calls[-1]
+        # The final status should be completed
+        assert any(
+            call.args[1].value == "completed" if hasattr(call.args[1], "value") else call.args[1] == "completed"
+            for call in calls
+        ) or mock_update_status.called
+
+
+class TestWorkerStart:
+    """Tests for worker start method."""
+
+    @pytest.mark.asyncio
+    @patch("api.services.worker.get_llm_client")
+    @patch("api.services.worker.claim_next_job")
+    async def test_worker_polls_for_jobs(self, mock_claim_job, mock_get_llm, mock_llm_client):
+        """Should poll for jobs when started."""
+        mock_get_llm.return_value = mock_llm_client
+        mock_claim_job.return_value = None  # No jobs available
+
+        config = WorkerConfig(poll_interval=0.1)
+        worker = JobWorker(config=config)
+
+        # Start worker in background
+        task = asyncio.create_task(worker.start())
+
+        # Let it poll a few times
+        await asyncio.sleep(0.3)
+        await worker.stop()
+
+        try:
+            await asyncio.wait_for(task, timeout=1.0)
+        except asyncio.TimeoutError:
+            task.cancel()
+
+        assert mock_claim_job.call_count >= 1

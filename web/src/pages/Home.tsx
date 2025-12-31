@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SkeletonDashboard } from '../components/ui/Skeleton'
 
 interface QueueStats {
   pending: number
@@ -27,7 +28,7 @@ export default function Home() {
       try {
         const [statsRes, jobsRes] = await Promise.all([
           fetch('/api/queue/stats'),
-          fetch('/api/queue?limit=5'),
+          fetch('/api/queue/?page=1&page_size=5&sort=newest'),
         ])
 
         if (statsRes.ok) {
@@ -35,7 +36,8 @@ export default function Home() {
         }
         if (jobsRes.ok) {
           const data = await jobsRes.json()
-          setRecentJobs(Array.isArray(data) ? data : [])
+          // API returns paginated response with jobs array
+          setRecentJobs(data.jobs || [])
         }
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err)
@@ -57,17 +59,15 @@ export default function Home() {
         return 'text-green-400'
       case 'failed':
         return 'text-red-400'
+      case 'investigating':
+        return 'text-orange-400'
       default:
         return 'text-gray-400'
     }
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    )
+    return <SkeletonDashboard />
   }
 
   return (
@@ -111,7 +111,7 @@ export default function Home() {
         </div>
         <div className="divide-y divide-gray-700">
           {recentJobs.length === 0 ? (
-            <div className="px-4 py-8 text-center text-gray-500">
+            <div className="px-4 py-8 text-center text-gray-300">
               No jobs in queue
             </div>
           ) : (
@@ -126,8 +126,8 @@ export default function Home() {
                     <div className="text-white font-medium">
                       {job.project_name}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(job.queued_at).toLocaleString()}
+                    <div className="text-sm text-gray-400">
+                      {new Date(job.queued_at + 'Z').toLocaleString()}
                     </div>
                   </div>
                   <span className={`text-sm font-medium ${statusColor(job.status)}`}>
@@ -154,7 +154,7 @@ function StatCard({
 }) {
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
-      <div className="text-sm text-gray-400">{label}</div>
+      <div className="text-sm text-gray-300">{label}</div>
       <div className={`text-3xl font-bold ${color}`}>{value}</div>
     </div>
   )

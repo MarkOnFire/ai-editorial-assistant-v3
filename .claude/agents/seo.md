@@ -21,9 +21,13 @@ You produce an SEO report saved as:
 OUTPUT/{project}/seo_output.md
 ```
 
+**IMPORTANT: Output must be plain Markdown text, NOT JSON.** The output should be human-readable markdown that can be viewed directly without parsing. Do not wrap output in code fences or JSON structures.
+
+**DO NOT include any preamble, commentary, or explanation before the report.** Start directly with `# SEO Report` - no "Here is the report..." or "I will generate..." text.
+
 ## SEO Report Structure
 
-```markdown
+Your output should look EXACTLY like this (plain markdown, no JSON):
 # SEO Report
 **Project:** {media_id}
 **Program:** {program_name}

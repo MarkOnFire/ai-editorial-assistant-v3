@@ -28,53 +28,53 @@ OUTPUT/{project}/formatter_output.md
 **Program:** {program_name}
 **Duration:** {HH:MM:SS}
 **Date Processed:** {timestamp}
-**Agent:** transcript-formatter
-**Model:** {model_used}
 
 ---
 
-## [Section Title] (0:00 - X:XX)
+<!-- REVIEW NOTES (only if needed):
+- Speaker unclear at 2:30: Could not identify from brainstorming doc
+- Spelling check needed: "Manitowoc" vs "Manitowac"
+-->
 
-**Speaker Name / Role:**
-Clean, readable paragraph with proper punctuation and natural breaks. Sentences flow naturally. Multiple sentences grouped logically. Speaker attribution is clear and consistent.
+**John Smith (Museum Curator):**
+Clean, readable paragraph with proper punctuation and natural breaks. Sentences flow naturally. Multiple sentences grouped logically.
 
-**Speaker Name / Role:**
-Response or continuation. Natural conversational flow maintained. Timestamps preserved at section boundaries but not mid-paragraph unless there's a significant time jump.
+**Sarah Johnson:**
+Response or continuation. Natural conversational flow maintained.
 
----
+**John Smith:**
+Subsequent mentions use first and last name, no role/title parenthetical needed after first introduction.
 
-## [Section Title] (X:XX - X:XX)
-
-**Speaker Name / Role:**
-Next section continues with consistent formatting...
-
----
-
-## Review Notes
-
-[If uncertainties remain after referencing the brainstorming document:]
-
-- **Speaker attribution unclear** (timestamp range): Unable to determine speaker at 2:30-2:45. Caption shows "Unknown Speaker."
-- **Spelling uncertainty**: "Manitowoc" appears in captions; unable to verify if this is the correct spelling for the Wisconsin city.
-- **Role/title missing**: "John" mentioned at 5:10 without context. Brainstorming doc does not identify this speaker.
-
-[This section only appears if there are unresolved items. If everything is clear, omit this section.]
+**Narrator:**
+Use generic labels only when actual name cannot be determined.
 
 ---
 
 **Status:** {ready_for_editing | needs_review}
-
-**Next Steps:** {If ready_for_editing: "Ready for copy-editor review." | If needs_review: "Resolve review items above before proceeding to copy editing."}
 ```
+
+**Key points:**
+- NO section headers or structural divisions
+- Review notes go at TOP as HTML comments, only if there are real issues
+- Speaker labels are names, not titles ("John Smith" not "The Curator")
+- Role/title only on first mention, in parentheses
 
 ## Formatting Guidelines
 
 ### Speaker Attribution
 
-1. **Use consistent names**: Reference the brainstorming document's speaker table
-2. **Include role/title on first mention**: "**Dr. Sarah Johnson, Marine Biologist:**"
-3. **Subsequent mentions**: "**Dr. Johnson:**" or "**Sarah:**" (whichever is most natural)
-4. **Unknown speakers**: Use descriptive labels from brainstorming doc ("**Narrator:**", "**Host:**", "**Interviewee 1:**")
+1. **Always use first AND last name**: Speaker labels must use the person's full name (first and last), NOT titles, roles, or honorifics
+   - ✅ CORRECT: "**John Smith:**" or "**Sarah Johnson:**"
+   - ❌ WRONG: "**Dr. Johnson:**" or "**Mr. Smith:**" or "**The Curator:**"
+   - ❌ WRONG: "**Dr. Sarah Johnson:**" (no titles/honorifics)
+   - Titles and honorifics (Dr., Mr., Ms., etc.) should NOT be included in speaker labels
+2. **Role/title context on first mention only**: Put role in parentheses after the name on first appearance
+   - ✅ CORRECT: "**Sarah Johnson (Marine Biologist):**"
+   - ❌ WRONG: "**Dr. Sarah Johnson (Marine Biologist):**"
+3. **All subsequent mentions**: Continue using first and last name without role
+   - ✅ CORRECT: "**Sarah Johnson:**" (every time)
+   - ❌ WRONG: "**Sarah:**" or "**Johnson:**" (don't shorten)
+4. **Unknown speakers**: Use "**Narrator:**", "**Host:**", or "**Speaker 1:**" only when the actual name cannot be determined from the brainstorming document
 
 ### Paragraph Breaks
 
@@ -92,15 +92,20 @@ Next section continues with consistent formatting...
 
 ### Timecodes
 
-- Place timecodes at section breaks, not mid-paragraph
+- Timecodes are NOT required in the formatted transcript
+- If included for reference, place sparingly (e.g., at the very start, or for major topic shifts)
 - Format: `(MM:SS)` for videos under 1 hour, `(H:MM:SS)` for longer content
-- Include timecodes in section headers: `## Interview with Expert (5:30 - 12:45)`
+- Do NOT create section headers with timecodes
 
-### Section Headers
+### No Section Headers or Structure Markers
 
-- Use section titles from the brainstorming document's structural breakdown
-- If no clear structure exists, create logical sections (Introduction, Main Topic, Conclusion)
-- Keep headers descriptive but concise
+**Do NOT add:**
+- Section headers, act markers, or structural divisions
+- Story structure markers like "[ACT 1]", "[RISING ACTION]", "[CLIMAX]"
+- Narrative analysis notes inline within the transcript
+- Editorial commentary scattered throughout the text
+
+**This is a transcript of spoken content, not a screenplay or article.** Just format the dialogue cleanly without imposing structure.
 
 ### Markdown Formatting
 
@@ -110,32 +115,46 @@ Next section continues with consistent formatting...
 - Do NOT use code blocks or code fences
 - Do NOT use block quotes unless quoting a third party
 
-## Needs Review Workflow
+## Handling Uncertainties
 
-If you encounter uncertainties that the brainstorming document doesn't resolve:
+If you encounter issues the brainstorming document doesn't resolve:
 
 1. **Use fallback assumptions** to complete the transcript:
-   - Unlabeled speakers: "**VOICEOVER:**" or "**Unknown Speaker:**"
+   - Unlabeled speakers: "**Narrator:**" or "**Speaker 1:**"
    - Unclear spellings: Use caption spelling as-is
-   - Missing roles/titles: Use name only ("**John:**")
+   - Missing roles/titles: Use name only ("**John Smith:**")
 
-2. **Add hidden marker** at the top of the document (after metadata, before first section):
+2. **CRITICAL: Review notes go ONLY at the TOP of the document**
+   - Place review notes as HTML comments IMMEDIATELY AFTER the metadata header
+   - ABOVE the horizontal rule (`---`) that separates header from content
+   - **NEVER** place review notes inline, scattered throughout, or at the end of the transcript
+   - **NEVER** add reviewer comments next to individual paragraphs
+   - The transcript body should be CLEAN - just speaker labels and dialogue
+
    ```markdown
-   <!-- NEEDS_REVIEW -->
+   # Formatted Transcript
+   **Project:** 2WLI1209HD
+   **Program:** Wisconsin Life
+   **Duration:** 00:28:15
+   **Date Processed:** 2025-12-30
+
+   <!-- REVIEW NOTES:
+   - Speaker unclear at 2:30-2:45: Caption shows unknown speaker
+   - Spelling check: "Manitowoc" vs "Manitowac"
+   -->
+
+   ---
+
+   **John Smith (Host):**
+   [Clean transcript content begins here, with NO inline notes...]
    ```
 
-3. **Include visible "Review Notes" section** at the end listing all uncertainties with timestamps
+3. **Set status** to `needs_review` instead of `ready_for_editing`
 
-4. **Set status** to `needs_review` instead of `ready_for_editing`
-
-5. **Update manifest** with `needs_review: true` flag
-
-**Detection criteria:**
-- Speaker attribution unclear in 2+ locations
-- Spelling uncertainty for proper nouns (names, places)
-- Missing context for speakers (no role/title available)
-- Significant timecode gaps or missing sections
-- Caption quality issues (garbled text, missing words)
+**Only flag for review if:**
+- Speaker cannot be identified at all (not just missing title)
+- Proper noun spelling is genuinely uncertain
+- Significant content is garbled or missing
 
 ## Example Transformations
 
@@ -154,12 +173,10 @@ If you encounter uncertainties that the brainstorming document doesn't resolve:
 ### Formatted Output
 
 ```markdown
-## Introduction (0:00 - 0:30)
-
-**Host:**
+**Mike Chen (Host):**
 Today we're looking at the history of Wisconsin cheese making.
 
-**Expert:**
+**Sarah Williams (Dairy Historian):**
 That's right, and it goes back further than most people realize - back to the 1800s.
 ```
 
@@ -171,36 +188,36 @@ That's right, and it goes back further than most people realize - back to the 18
 [Unknown] the factory in Manitowac was the first to use this technique
 ```
 
-### Formatted Output with Review Marker
+### Formatted Output with Review Notes
 
 ```markdown
-<!-- NEEDS_REVIEW -->
+<!-- REVIEW NOTES:
+- Speaker unclear at 2:30: Caption shows "Unknown" - could not identify
+- Spelling check: "Manitowac" may be "Manitowoc" (Wisconsin city)
+-->
 
-## Historical Context (2:00 - 5:00)
-
-**VOICEOVER:**
+**Narrator:**
 The factory in Manitowac was the first to use this technique.
 
 ---
 
-## Review Notes
-
-- **Speaker attribution unclear** (2:30-2:45): Caption shows "Unknown Speaker." Unable to identify from brainstorming document.
-- **Spelling uncertainty**: "Manitowac" appears in captions. Correct spelling may be "Manitowoc" (Wisconsin city).
+**Status:** needs_review
 ```
 
 ## Quality Checklist
 
 Before saving your formatted transcript, verify:
 
-- [ ] All speaker names are consistent (match brainstorming doc)
+- [ ] Speaker labels use first AND last name (e.g., "**Sarah Williams:**" not "**Dr. Williams:**" or "**Sarah:**")
+- [ ] NO titles or honorifics in speaker labels (no Dr., Mr., Ms., etc.)
+- [ ] All speaker names are consistent throughout
 - [ ] Paragraphs flow naturally with logical breaks
-- [ ] Timecodes are present at major section boundaries
+- [ ] No section headers, act markers, or structural divisions added
 - [ ] No code blocks or markdown misuse
 - [ ] Spelling and punctuation are clean
 - [ ] Filler words removed unless stylistically important
-- [ ] Section headers match structural breakdown
-- [ ] If uncertainties exist: Review Notes section present AND `<!-- NEEDS_REVIEW -->` marker added
+- [ ] **Review notes (if any) are ONLY at TOP, above the `---` separator - NONE inline**
+- [ ] Transcript body is CLEAN with no inline comments or notes
 - [ ] Status clearly set (`ready_for_editing` or `needs_review`)
 
 ## Handling Edge Cases

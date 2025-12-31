@@ -1,7 +1,7 @@
 # Editorial Assistant v3.0 - Development Progress
 
-Last updated: 2025-12-29
-Current sprint: 4.1 (Agent Prompts & Job Worker) - COMPLETE
+Last updated: 2025-12-30
+Current sprint: 8.1 COMPLETE, 8.2 MOSTLY COMPLETE, 9.2.1 COMPLETE, 10.1 COMPLETE
 
 ## Sprint Status
 
@@ -35,7 +35,359 @@ Current sprint: 4.1 (Agent Prompts & Job Worker) - COMPLETE
 - [x] 4.1.2 needs_review flag handling
 - [x] 4.1.3 Inline revision reports
 
+### Sprint 4.2: Multi-Preset LLM Routing - COMPLETE
+- [x] 4.2.1 Add cheapskate preset (free tier models)
+- [x] 4.2.2 Context-aware backend selection (transcript length escalation)
+- [x] 4.2.3 Config API endpoints (phase-backends, routing)
+- [x] 4.2.4 Settings page UI (agent preset assignment, escalation config)
+- [x] 4.2.5 End-of-sprint code review (API + Frontend)
+- [x] 4.2.6 Watch folder transcript auto-queue
+- [x] 4.2.7 Free tier model prompt refinements
+
+### Sprint 5.1: Advanced Features - COMPLETE
+- [→] 5.1.1 Web UI bulk transcript uploader (moved to 7.2.1)
+- [x] 5.1.2 Manager agent with QA review
+- [x] 5.1.3 Duplicate transcript detection (409 response)
+- [x] 5.1.4 Archive folder fallback for transcripts
+- [x] 5.1.5 Autonomous failure recovery (manager decides RETRY/ESCALATE/FIX/FAIL)
+
+### Sprint 6.1: SST Record Linking - COMPLETE
+- [x] 6.1.1 Add Airtable fields to Job model
+- [x] 6.1.2 Create Airtable service (READ-ONLY)
+- [x] 6.1.3 Media ID extraction utility
+- [x] 6.1.4 Auto-link SST on job creation
+- [x] 6.1.5 Display SST link in Job Detail page
+
+### Sprint 6.2: SST Context Injection - PLANNED (MEDIUM PRIORITY)
+- [ ] 6.2.1 Fetch SST fields on job start
+- [ ] 6.2.2 Update analyst prompt with SST context
+- [ ] 6.2.3 Update formatter prompt with SST context
+- [ ] 6.2.4 Update SEO prompt with SST context
+- [ ] 6.2.5 Update manager prompt for SST cross-reference
+
+### Sprint 6.3: Copy Editor Workstation - SUPERSEDED
+**Replaced by Sprint 10.1 (MCP Server)** - Slash commands replaced by MCP tools which provide better Claude Desktop integration.
+- [~] 6.3.1 API endpoint → Use MCP `load_project_for_editing()`
+- [~] 6.3.2 /lookup → Use MCP `get_project_summary()`
+- [~] 6.3.3 /edit → Use MCP `load_project_for_editing()`
+- [~] 6.3.4 /available → Use MCP `list_processed_projects()`
+
+### Sprint 7.1: WebSocket Live Updates - PLANNED (LOW PRIORITY)
+- [ ] 7.1.1 WebSocket endpoint for live updates
+- [ ] 7.1.2 Dashboard WebSocket client
+
+### Sprint 7.2: Web UI Bulk Uploader - PLANNED (LOW PRIORITY)
+- [ ] 7.2.1 Web UI bulk transcript uploader (watch_transcripts.py works for now)
+
+### Sprint 7.3: Timestamp Agent - PLANNED (OPTIONAL)
+- [ ] 7.3.1 Timestamp agent (optional)
+
+### Sprint 8.1: Critical Accessibility - COMPLETE
+- [x] 8.1.1 Add skip navigation link (Layout.tsx has skip link)
+- [x] 8.1.2 Add focus-visible states globally (index.css has focus-visible)
+- [x] 8.1.3 Fix color contrast violations (JobDetail, Queue, Projects, Settings - gray-500/600 to gray-400/300)
+- [x] 8.1.4 Add labels to form inputs (ARIA labels on toggles in Settings.tsx)
+- [x] 8.1.5 Add ARIA to navigation (Layout.tsx has aria-label, aria-current)
+- [x] 8.1.6 Fix modal accessibility (useFocusTrap hook created)
+- [x] 8.1.7 Add reduced motion support (index.css has prefers-reduced-motion)
+- [x] 8.1.8 Add error announcements (role=alert and role=status in Toast component)
+
+### Sprint 8.2: Interactive Feedback System - MOSTLY COMPLETE
+- [x] 8.2.1 Create Toast notification component (web/src/components/ui/Toast.tsx with ToastProvider)
+- [x] 8.2.2 Create ConfirmDialog component (web/src/components/ui/ConfirmDialog.tsx with focus trap)
+- [ ] 8.2.3 Replace native dialogs in Queue.tsx
+- [x] 8.2.4 Create LoadingSpinner component (web/src/components/ui/LoadingSpinner.tsx)
+- [x] 8.2.5 Create Skeleton loader components (web/src/components/ui/Skeleton.tsx)
+- [ ] 8.2.6 Replace loading text with skeletons
+- [ ] 8.2.7 Add action feedback to JobDetail
+
+### Sprint 8.3: Navigation & Wayfinding - IN PROGRESS
+- [ ] 8.3.1 Fix back navigation in JobDetail
+- [ ] 8.3.2 Add Breadcrumb component
+- [x] 8.3.3 Add System page to main navigation (added to Layout.tsx)
+- [ ] 8.3.4 Add filter counts to Queue tabs
+- [ ] 8.3.5 Implement instant search with debounce
+- [ ] 8.3.6 Add keyboard shortcuts
+
+### Sprint 8.4: Cognitive Load Reduction - PLANNED (MEDIUM)
+- [ ] 8.4.1 Refactor Settings page with tabs
+- [ ] 8.4.2 Simplify StatusBar information
+- [ ] 8.4.3 Add relative time display utilities
+- [ ] 8.4.4 Apply relative times throughout app
+- [ ] 8.4.5 Add duration to completed jobs
+
+### Sprint 8.5: Accessibility Preferences - PLANNED (LOW)
+- [ ] 8.5.1 Create Preferences context
+- [ ] 8.5.2 Add Accessibility settings section
+- [ ] 8.5.3 Apply preferences throughout app
+
+### Sprint 9.1: Bug Fixes - COMPLETE
+- [x] 9.1.1 Fix race condition in claim_next_job (atomic UPDATE...RETURNING)
+- [x] 9.1.2 Robust project_path sanitization
+- [x] 9.1.3 Load worker defaults from config file
+
+### Sprint 9.2: Test Coverage - IN PROGRESS
+- [x] 9.2.1 Add tests for JobWorker (tests/api/test_worker.py - 25 tests pass)
+- [ ] 9.2.2 Add tests for API endpoints
+- [ ] 9.2.3 Add tests for LLMClient
+- [ ] 9.2.4 Add tests for watch_transcripts.py
+
+### Sprint 9.3: Validation Review - PLANNED (HIGH)
+- [ ] 9.3.1 Second round code review (after bug fixes)
+
+### Sprint 10.1: MCP Server for Copy Editor - COMPLETE
+Primary interface for copy editor agent in Claude Desktop. Tool names match EDITOR_AGENT_INSTRUCTIONS.md exactly.
+
+**Core Tools (Critical)**:
+- [x] 10.1.1 MCP server scaffold (Python mcp library, stdio transport, FastAPI backend)
+- [x] 10.1.2 list_processed_projects() - Discover ready projects with status and deliverables
+- [x] 10.1.3 load_project_for_editing(name) - Full context bundle for editing session
+- [x] 10.1.4 get_formatted_transcript(name) - AP Style transcript for fact-checking
+- [x] 10.1.5 save_revision(name, content, version) - Save copy revisions with auto-versioning
+
+**Supporting Tools (High)**:
+- [x] 10.1.6 save_keyword_report(name, content, version) - Save SEO reports
+- [x] 10.1.7 get_project_summary(name) - Quick status check
+- [x] 10.1.8 read_project_file(path) - Read specific project files
+- [x] 10.1.9 Claude Desktop configuration docs
+- [x] 10.1.10 Web UI: Copy Editor handoff messaging (direct users to Claude Desktop)
+
+### Sprint 10.2: MCP Server Enhancements - MEDIUM
+- [ ] 10.2.1 SST context integration into load_project_for_editing (Airtable READ-ONLY)
+- [ ] 10.2.2 search_projects - Text search, status filter, date range
+- [ ] 10.2.3 MCP prompts for common workflows (start_edit_session, etc.)
+
 ## Session Notes
+
+### 2025-12-30 - Sprint 8.x Accessibility & Interactive Feedback
+
+**Completed tasks:**
+
+1. **Sprint 8.1: Critical Accessibility (8.1.3, 8.1.4, 8.1.8)**
+   - Fixed color contrast violations in JobDetail, Queue, Projects (gray-500/600 to gray-400/300)
+   - Added ARIA role="switch", aria-checked, aria-label to toggle buttons in Settings.tsx
+   - Error/success announcements via Toast component with role=alert/status
+
+2. **Sprint 8.2: Interactive Feedback (8.2.1, 8.2.2, 8.2.4, 8.2.5)**
+   - Created Toast.tsx with ToastProvider, useToast hook, 4 variants (success, error, warning, info)
+   - Created ConfirmDialog.tsx with focus trap, escape key, danger/warning/info variants
+   - Created LoadingSpinner.tsx with sm/md/lg sizes
+   - Created Skeleton.tsx with SkeletonCard, SkeletonTableRow, SkeletonListItem, SkeletonDashboard, SkeletonQueue
+
+3. **Sprint 8.3: Navigation (8.3.3)**
+   - Added System page to main navigation in Layout.tsx
+
+4. **Sprint 9.2: Test Coverage (9.2.1)**
+   - Created comprehensive tests/api/test_worker.py with 25 tests
+   - Tests cover: WorkerConfig, JobWorker init, phase completion, setup, load, prompts, run_phase, recovery, heartbeat
+
+**Key files created:**
+- `web/src/components/ui/Toast.tsx`
+- `web/src/components/ui/ConfirmDialog.tsx`
+- `web/src/components/ui/LoadingSpinner.tsx`
+- `web/src/components/ui/Skeleton.tsx`
+- `tests/api/test_worker.py`
+
+**Build verified:** TypeScript compiles, all 25 worker tests pass
+
+**Remaining high-priority tasks:**
+- 8.2.3 Replace native dialogs in Queue.tsx
+- 8.2.6 Replace loading text with skeletons
+- 8.2.7 Add action feedback to JobDetail
+- 8.3.1-2, 8.3.4-6 Navigation improvements
+- 9.2.2-4 Additional test coverage
+- 6.2.1-5 SST context injection into agent prompts
+
+### 2025-12-30 - v3.1 Roadmap Planning (Airtable Deep Integration)
+
+**Documentation created:**
+
+1. **ROADMAP_v3.1.md** - Comprehensive roadmap for Airtable integration
+   - Sprint 6: Airtable Deep Integration (SST linking, context injection, copy editor workstation)
+   - Sprint 7: Real-Time & Polish (WebSocket, bulk uploader, timestamp agent)
+   - Airtable base/table IDs documented (appZ2HGwhiifQToB6, tblTKFOwTvK7xw1H5)
+   - Field mappings for SST lookup
+
+2. **CRITICAL CONSTRAINT: Read-Only Airtable Access**
+   - Added to CLAUDE.md (project-level)
+   - Added to ROADMAP_v3.1.md
+   - AI agents must NEVER write to Airtable
+   - All edits made manually by human user
+
+3. **Bulk Delete Feature** - `api/routers/queue.py`, `web/src/pages/Queue.tsx`
+   - Added DELETE /api/queue/bulk endpoint
+   - "Clear Failed/Cancelled" button on Queue page
+   - Safety guard: won't delete pending/in_progress jobs
+
+**Key decisions:**
+- Embedded chat interface tabled (deferred indefinitely)
+- Bulk uploader moved from 5.1.1 to 7.2.1 (watch_transcripts.py works for now)
+- Sprint 6.1 (SST Record Linking) is next priority
+- Sprint 6.3 (Copy Editor Workstation) is high priority after 6.1
+- Sprint 7 features are lower priority
+
+### 2025-12-30 - Autonomous Failure Recovery (Sprint 5.1.3-5.1.5)
+
+**Tasks completed:**
+
+1. **Duplicate Transcript Detection (5.1.3)** - `api/routers/queue.py`, `api/services/database.py`
+   - Added `find_jobs_by_transcript()` to find existing jobs for same transcript
+   - Queue POST returns 409 with existing job details if duplicate detected
+   - Prevents wasteful re-processing of already-processed transcripts
+   - `force=true` query param allows override for intentional resubmission
+
+2. **Archive Folder Fallback (5.1.4)** - `api/services/worker.py`
+   - Worker now checks `transcripts/archive/` if file not in main folder
+   - Supports re-processing of previously archived transcripts
+   - Graceful handling when transcript moves during processing
+
+3. **Autonomous Failure Recovery (5.1.5)** - `api/services/worker.py`, `.claude/agents/manager.md`
+   - Added `_analyze_and_recover()` method for intelligent failure handling
+   - Manager agent analyzes failures and decides recovery action:
+     - **RETRY**: Transient errors (timeouts, rate limits) - re-run at same tier
+     - **ESCALATE**: Model capability issues - re-run at higher tier
+     - **FIX**: Minor fixable issues - manager applies correction
+     - **FAIL**: Fundamental issues - marks job as failed for human review
+   - Worker executes recovery action automatically
+   - Recovery analysis saved to `recovery_analysis.md`
+   - Added "investigating" status to JobStatus enum
+   - Frontend updated with purple badge for investigating status
+
+4. **Manager Prompt Updates** - `.claude/agents/manager.md`
+   - Added Failure Analysis Mode section with recovery action guidelines
+   - Clear decision criteria for each action type
+   - Structured report format for recovery analysis
+   - Action parsing supports markdown bold format (`**ACTION: X**`)
+
+**Key implementation details:**
+- `_force_tier` context variable allows forcing tier on recovery
+- `_complete_remaining_phases()` continues processing after successful recovery
+- Action parsing searches full content (not just first line) and handles markdown
+- Reason extraction supports both `REASON:` and `### Rationale` formats
+
+### 2025-12-30 - Manager Agent Implementation (Sprint 5.1.2)
+
+**Tasks completed:**
+
+1. **Manager Agent Instructions** - `.claude/agents/manager.md`
+   - QA Manager reviews all automated outputs (analyst, formatter, seo)
+   - Checks formatter for: speaker names (first+last only, no titles), review notes at TOP only
+   - Checks SEO for: title length, description quality, tag relevance
+   - Issues categorized as CRITICAL, MAJOR, MINOR
+   - Outputs APPROVED or NEEDS_REVISION status
+
+2. **Worker Pipeline Update** - `api/services/worker.py`
+   - Added "manager" to PHASES (now: analyst, formatter, seo, manager)
+   - Manager phase always uses big-brain tier (tier 2) for quality oversight
+   - Added FORCE_BIG_BRAIN_PHASES config for QA phases
+   - Manager prompt includes all previous outputs for review
+
+3. **Config Updates** - `config/llm-config.json`
+   - Added manager to phase_backends: "openrouter-big-brain"
+   - Added manager to phase_base_tiers: tier 2
+
+4. **UI Update** - `web/src/pages/Settings.tsx`
+   - Added QA Manager to agent roster with checkmark icon
+   - Shows as locked to big-brain tier
+
+5. **Formatter Instructions Refinements** - `.claude/agents/formatter.md`
+   - Made review note placement CRITICAL: TOP only, above `---` separator
+   - Strengthened examples showing HTML comment format at top
+   - Updated quality checklist to verify clean transcript body
+
+### 2025-12-30 - Sprint 4.2 Additions & Testing
+
+**Tasks completed:**
+
+1. **Watch Folder Script (4.2.6)** - `watch_transcripts.py`
+   - Auto-queues transcript files from transcripts/ folder
+   - `--once` flag for batch mode, continuous watch mode available
+   - Queued 30+ transcripts for testing cheapskate tier
+
+2. **Free Tier Prompt Refinements (4.2.7)** - `.claude/agents/formatter.md`, `.claude/agents/seo.md`
+   - Formatter: Use actual names not titles (e.g., "John Smith" not "The Curator")
+   - Formatter: No section headers, act markers, or structural divisions
+   - Formatter: Review notes only at top as HTML comments
+   - SEO: Plain Markdown output, no JSON
+   - SEO: No preamble/commentary before report
+
+3. **Tier Visibility Improvements**
+   - Added `get_tier_for_phase_with_reason()` to llm.py
+   - Worker captures tier_reason in phase data
+   - JobPhase model updated with: model, tier, tier_label, tier_reason, attempts
+   - UI shows tier info for each phase
+
+4. **Free Model Cost Fix**
+   - Added free models to MODEL_PRICING table
+   - Force $0 cost for models ending in `:free`
+
+5. **Worker Phase Cleanup**
+   - Removed copy_editor from automatic PHASES (now manual/interactive only)
+
+**Testing in progress:**
+- 42 total jobs, 12 completed, 26 pending
+- All using cheapskate tier (free models)
+- Output quality verified: formatter and SEO prompts working correctly
+
+**Next sprint (5.1):**
+- 5.1.1: Web UI bulk transcript uploader
+- 5.1.2: Manager agent with QA review
+
+### 2025-12-29 - Sprint 4.2 Multi-Preset LLM Routing (COMPLETE)
+
+**Tasks completed:**
+
+1. **Cheapskate Preset (4.2.1)** - `config/llm-config.json`
+   - Added `openrouter-cheapskate` backend with free tier models
+   - Preset models: xiaomi/mimo-v2-flash:free, mistralai/devstral-2-2512:free, deepseek/deepseek-r1-0528:free
+   - Added `phase_backends` config: cheapskate for formatter/seo, default for analyst/copy_editor
+   - Added `routing` section for long-form escalation
+
+2. **Context-Aware Backend Selection (4.2.2)** - `api/services/llm.py`, `api/services/worker.py`
+   - Updated `get_backend_for_phase(phase, context)` for transcript-length routing
+   - Worker calculates transcript metrics (word count / 150 wpm = estimated duration)
+   - Long-form transcripts (>15 min) escalate analyst/copy_editor to big-brain
+   - Added `calculate_transcript_metrics()` helper in `api/services/utils.py`
+
+3. **Config API Endpoints (4.2.3)** - `api/routers/config.py`
+   - GET/PATCH `/api/config/phase-backends` - View/update agent-to-backend mappings
+   - GET/PATCH `/api/config/routing` - View/update escalation settings
+   - Validates inputs, saves to JSON, reloads LLM client config
+
+4. **Settings Page UI (4.2.4)** - `web/src/pages/Settings.tsx`
+   - Agent preset assignment with color-coded dropdowns (cyan/purple/green)
+   - Long-form threshold slider (5-60 minutes)
+   - Phase escalation toggles
+   - Escalation preview showing routing decisions
+   - Save/reset with pending state tracking
+
+5. **System Page Updates** - `web/src/pages/System.tsx`
+   - Three-column preset display (default, big-brain, cheapskate)
+   - Green color styling for cheapskate tier
+   - Agent roster shows all three tier badges
+
+6. **Code Review (4.2.5)** - End-of-sprint review
+   - API review found: config file write error handling (fixed), escalation backend validation (fixed)
+   - Frontend review found: JSON error handling on save (fixed), timeout cleanup (noted for future)
+   - All critical issues addressed
+
+7. **Tiered Escalation Enhancement** - `api/services/llm.py`, `api/services/worker.py`, `web/src/pages/Settings.tsx`
+   - Three-tier system: cheapskate (0) → default (1) → big-brain (2)
+   - Duration-based tier selection with configurable thresholds (0-15 min, 15-30 min, 30+ min)
+   - Failure-based escalation: on timeout or error, automatically retry with next tier
+   - Escalation config: enabled, on_failure, on_timeout, timeout_seconds, max_retries_per_tier
+   - Worker implements retry loop with tier escalation until success or max tier reached
+   - Settings UI updated with:
+     - Agent Base Tiers section (dropdown per agent)
+     - Duration-Based Tier Selection with sliders
+     - Failure-Based Escalation toggles and timeout config
+     - Routing Preview showing tier assignments
+
+**Deferred to future sprint:**
+- Timestamp agent (separate from formatter)
+- "The Manager" escalation pattern (cheapskate asks big-brain for help when stuck)
+
+**Reminder:** User needs to create `ai-editorial-assistant-cheapskate` preset on OpenRouter with the free tier models.
 
 ### 2025-12-29 - Sprint 4.1 COMPLETE (Agent Prompts & Job Worker)
 

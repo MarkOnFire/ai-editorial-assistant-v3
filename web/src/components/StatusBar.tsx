@@ -66,17 +66,17 @@ export default function StatusBar() {
                 error ? 'bg-red-500 animate-pulse' : 'bg-green-500'
               }`}
             />
-            <span className={error ? 'text-red-400' : 'text-gray-400'}>
+            <span className={error ? 'text-red-400' : 'text-gray-300'}>
               {error ? 'Offline' : 'Connected'}
             </span>
             {error && (
-              <span className="text-gray-600 text-[10px]">→</span>
+              <span className="text-gray-400 text-[10px]">→</span>
             )}
           </Link>
 
           {/* Queue Stats */}
           {health?.queue && (
-            <div className="flex items-center space-x-3 text-gray-500">
+            <div className="flex items-center space-x-3 text-gray-300">
               <span>
                 <span className="text-yellow-400">
                   {health.queue.pending}
@@ -96,30 +96,30 @@ export default function StatusBar() {
         {/* Center: Model Configuration */}
         {health?.llm && (
           <div className="flex items-center space-x-2">
-            <span className="text-gray-500">Backend:</span>
+            <span className="text-gray-300">Backend:</span>
             <span className="text-cyan-400 font-mono">
               {health.llm.active_backend || health.llm.primary_backend || 'none'}
             </span>
-            <span className="text-gray-600">|</span>
+            <span className="text-gray-400">|</span>
             {health.llm.configured_preset ? (
               <>
-                <span className="text-gray-500">Preset:</span>
+                <span className="text-gray-300">Preset:</span>
                 <span className="text-purple-400 font-mono">
                   {health.llm.configured_preset}
                 </span>
               </>
             ) : (
               <>
-                <span className="text-gray-500">Model:</span>
-                <span className="text-gray-400 font-mono">
+                <span className="text-gray-300">Model:</span>
+                <span className="text-gray-300 font-mono">
                   {health.llm.fallback_model || 'none'}
                 </span>
               </>
             )}
             {health.llm.active_model && (
               <>
-                <span className="text-gray-600">|</span>
-                <span className="text-gray-500">Active:</span>
+                <span className="text-gray-400">|</span>
+                <span className="text-gray-300">Active:</span>
                 <span className="text-emerald-400 font-mono">
                   {health.llm.active_model}
                 </span>
@@ -131,7 +131,7 @@ export default function StatusBar() {
         {/* Right: Last Run Cost */}
         <div className="flex items-center space-x-4">
           {health?.last_run && (
-            <div className="flex items-center space-x-3 text-gray-500">
+            <div className="flex items-center space-x-3 text-gray-300">
               <span>
                 Last run:{' '}
                 <span className="text-green-400">
@@ -139,7 +139,7 @@ export default function StatusBar() {
                 </span>
               </span>
               <span>
-                <span className="text-gray-400">
+                <span className="text-gray-300">
                   {formatTokens(health.last_run.total_tokens)}
                 </span>{' '}
                 tokens
@@ -147,7 +147,7 @@ export default function StatusBar() {
             </div>
           )}
           {lastUpdated && (
-            <span className="text-gray-600">
+            <span className="text-gray-400">
               {lastUpdated.toLocaleTimeString()}
             </span>
           )}

@@ -2,13 +2,24 @@
 Editorial Assistant v3.0 - Structured JSON Logging
 
 Provides JSON-formatted logging for consistent API log output.
+Logs to both console and rotating log files for stability monitoring.
+
+Log files:
+- logs/worker.log - Main worker events
+- logs/api.log - API request/response events
+- OUTPUT/{project}/job.log - Per-job processing logs
 """
 
 import logging
+from logging.handlers import RotatingFileHandler
 import json
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, Optional
+
+# Default log directory
+LOGS_DIR = Path(os.getenv("LOGS_DIR", "logs"))
 
 
 class JSONFormatter(logging.Formatter):
@@ -55,14 +66,21 @@ class JSONFormatter(logging.Formatter):
 _logging_configured = False
 
 
-def setup_logging(level: Optional[str] = None) -> None:
+def setup_logging(
+    level: Optional[str] = None,
+    log_file: Optional[str] = None,
+    enable_console: bool = True,
+) -> None:
     """
-    Configure Python logging for JSON output.
+    Configure Python logging for JSON output to console and file.
 
     Args:
         level: Log level as string (DEBUG, INFO, WARNING, ERROR).
                If not specified, reads from LOG_LEVEL environment variable.
                Defaults to INFO if neither is provided.
+        log_file: Optional log file name (e.g., "worker.log").
+                  Will be created in LOGS_DIR.
+        enable_console: Whether to also log to console (default: True)
     """
     global _logging_configured
 
@@ -82,11 +100,26 @@ def setup_logging(level: Optional[str] = None) -> None:
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
 
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(numeric_level)
-    console_handler.setFormatter(JSONFormatter())
+    # Console handler
+    if enable_console:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(numeric_level)
+        console_handler.setFormatter(JSONFormatter())
+        root_logger.addHandler(console_handler)
 
-    root_logger.addHandler(console_handler)
+    # File handler (rotating, max 10MB per file, keep 5 backups)
+    if log_file:
+        LOGS_DIR.mkdir(parents=True, exist_ok=True)
+        log_path = LOGS_DIR / log_file
+        file_handler = RotatingFileHandler(
+            log_path,
+            maxBytes=10 * 1024 * 1024,  # 10 MB
+            backupCount=5,
+            encoding='utf-8'
+        )
+        file_handler.setLevel(numeric_level)
+        file_handler.setFormatter(JSONFormatter())
+        root_logger.addHandler(file_handler)
 
     _logging_configured = True
 

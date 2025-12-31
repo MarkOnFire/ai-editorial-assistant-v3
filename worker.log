@@ -1,0 +1,1 @@
+{"timestamp": "2025-12-30T22:04:39.901378+00:00", "level": "INFO", "logger": "api.services.worker", "message": "Worker starting", "extra": {"worker_id": "worker-56568", "poll_interval": 5, "max_concurrent": 3}}

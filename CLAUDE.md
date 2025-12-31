@@ -86,7 +86,7 @@ Tasks in `feature_list.json` have an `agent` field:
 
 ## Git Commit Convention
 
-**See**: `/Users/mriechers/Developer/workspace_ops/conventions/COMMIT_CONVENTIONS.md`
+**See**: `/Users/mriechers/Developer/the-lodge/conventions/COMMIT_CONVENTIONS.md`
 
 AI commits should include agent attribution:
 ```
@@ -111,6 +111,17 @@ The full v3.0 design specification is in `DESIGN_v3.0.md`. Key sections:
 
 See `feature_list.json` for task queue and `claude-progress.txt` for status.
 
+## Airtable Integration (CRITICAL)
+
+**READ-ONLY ACCESS ONLY.** AI agents must NEVER write to Airtable.
+
+- Agents may READ Airtable data (SST records, metadata) to inform their work
+- Agents must NEVER use `create_record`, `update_records`, `delete_records`, or any write operations
+- All Airtable edits are made manually by the human user
+- If a user asks an agent to update Airtable, the agent must decline and explain this policy
+
+This constraint exists for data integrity and safety. The Airtable Single Source of Truth (SST) is the canonical metadata store for all PBS Wisconsin projects and must only be modified by authorized humans.
+
 ## Notes for Claude Code
 
 1. **Check feature_list.json** before starting work
@@ -118,3 +129,4 @@ See `feature_list.json` for task queue and `claude-progress.txt` for status.
 3. **Run tests** before marking complete
 4. **Don't break the API contract** - OpenAPI spec is the source of truth (once defined)
 5. **Log feedback** - Append issues to `AGENT-FEEDBACK.md` if created
+6. **NEVER write to Airtable** - Read-only access for all AI agents

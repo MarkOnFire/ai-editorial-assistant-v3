@@ -1,0 +1,4 @@
+# MCP Server Dependencies
+mcp>=1.0.0
+httpx>=0.26.0
+pydantic>=2.5.0

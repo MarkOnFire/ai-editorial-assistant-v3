@@ -1,0 +1,489 @@
+{"timestamp": "2025-12-30T17:16:54.174145+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:16:54.184384+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:16:54.184830+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:07.921729+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:07.922580+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:08.291256+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:08.298031+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:08.298222+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:15.877883+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:15.878650+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:16.254721+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:16.261528+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:16.261735+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:24.447392+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:24.448049+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:24.791888+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:24.798418+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:24.798605+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:31.058154+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:31.058604+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:31.406039+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:31.412715+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:31.412917+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:38.992174+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:38.992668+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:39.342055+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:39.348734+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:39.348917+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:47.232442+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:47.233065+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:47.573631+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:47.580194+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:47.580379+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:53.440849+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:17:53.441453+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:17:53.800021+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:17:53.807210+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:17:53.807405+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:00.676521+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:00.676880+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:01.032590+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:01.039675+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:01.039872+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:10.943587+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:10.944545+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:11.295388+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:11.302185+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:11.302370+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:16.152829+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:16.153562+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:16.494275+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:16.501425+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:16.501625+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:21.659499+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:21.660445+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:22.004375+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:22.011578+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:22.011848+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:29.084111+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:29.085127+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:29.442778+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:29.449677+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:29.449870+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:34.604596+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:34.605137+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:34.973630+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:34.980562+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:34.980749+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:41.548296+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:41.549153+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:41.897034+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:41.903624+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:41.903811+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:48.270814+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:48.271942+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:48.625717+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:48.632364+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:48.632550+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:55.709021+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:18:55.709750+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:18:56.061226+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:18:56.068239+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:18:56.068432+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:05.466692+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:19:05.467327+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:19:05.810360+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:19:05.817730+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:05.817942+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:12.588905+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:19:12.589537+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:19:12.931388+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:19:12.937829+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:12.938007+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:20.213585+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:19:20.214794+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:19:20.567416+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:19:20.573819+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:20.574005+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:26.432584+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:19:26.433840+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:19:26.796801+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:19:26.803540+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:26.803733+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:33.774656+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:19:33.775314+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:19:34.120876+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:19:34.127476+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:19:34.127664+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:26:24.471355+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:26:24.473344+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:26:24.961961+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:26:24.971443+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:26:24.971794+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:26:43.364686+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:26:43.365527+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:26:43.824342+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:26:43.833867+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:26:43.834208+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:38:44.240161+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:38:44.242138+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:38:44.682679+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:38:44.692509+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:38:44.692817+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:38:57.721679+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:38:57.722313+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:38:58.066677+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:38:58.073003+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:38:58.073184+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:39:09.083224+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:39:09.083914+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:39:09.446144+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:39:09.452616+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:39:09.452792+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:58:19.985422+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T17:58:19.986691+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T17:58:20.443402+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T17:58:20.452695+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T17:58:20.453035+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:07:29.637072+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:07:29.638088+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:07:30.054084+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:07:30.063452+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:07:30.063805+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:07:42.792993+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:07:42.793715+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:07:43.144560+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:07:43.151177+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:07:43.151357+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:07:54.565589+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:07:54.566404+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:07:54.910008+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:07:54.916485+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:07:54.916671+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:08:08.040090+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:08:08.040716+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:08:08.396986+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:08:08.404160+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:08:08.404354+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:08:16.182762+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:08:16.183436+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:08:16.532804+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:08:16.539662+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:08:16.539890+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:16:14.192902+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:16:14.193781+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:16:14.657925+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:16:14.667261+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:16:14.667592+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:08.395336+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:17:08.395828+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:17:08.747524+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:17:08.754441+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:08.754634+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:18.751069+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:17:18.751471+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:17:19.098496+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:17:19.105288+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:19.105477+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:38.499332+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:17:38.499799+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:17:38.854833+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:17:38.861794+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:38.861992+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:54.621229+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:17:54.621714+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:17:54.966126+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:17:54.973276+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:17:54.973466+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:25:47.713536+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:25:47.714852+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:25:48.132953+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:25:48.142685+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:25:48.142882+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:25:58.346176+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:25:58.347102+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:25:58.697066+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:25:58.703281+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:25:58.703459+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.035523+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.036086+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.386746+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.393333+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.393515+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.596068+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.596680+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.949083+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.955525+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:28:14.955702+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:28:31.720983+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:28:31.721723+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:28:32.070611+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:28:32.077447+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:28:32.077637+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:31:50.526779+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:31:50.527740+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:31:50.973620+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:31:50.983016+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:31:50.983352+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:32:20.470699+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:32:20.471279+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:32:20.939702+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:32:20.949894+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:32:20.950232+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:33:10.228254+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:33:10.228944+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:33:10.694484+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:33:10.706538+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:33:10.706874+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:34:35.846648+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T18:34:35.847389+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T18:34:36.297353+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T18:34:36.307958+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T18:34:36.308342+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:54:56.659161+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T21:54:56.661871+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T21:54:57.195079+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T21:54:57.206384+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:54:57.206820+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:56:02.352588+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T21:56:02.353087+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T21:56:02.815592+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T21:56:02.824980+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:56:02.825295+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:56:23.530128+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T21:56:23.530734+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T21:56:23.891325+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T21:56:23.897777+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:56:23.898010+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:56:33.898845+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T21:56:33.899516+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T21:56:34.301958+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T21:56:34.308916+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T21:56:34.309148+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:00:03.165078+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:00:03.166275+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:00:03.639248+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:00:03.649236+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:00:03.649582+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:00:20.615402+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:00:20.615992+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:00:20.987574+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:00:20.994611+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:00:20.994827+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:00:44.236802+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:00:44.237442+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:03:44.326807+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:03:44.335632+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:03:44.335946+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:09:25.965601+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:09:25.968004+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:09:26.452654+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:09:26.463026+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:09:26.463390+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:09:54.745539+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:09:54.746876+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:09:55.191660+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:09:55.198495+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:09:55.198690+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:11:28.940537+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:11:28.941161+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:11:39.390495+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:11:39.400065+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:11:39.400394+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:13:03.007499+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:13:03.008091+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:13:03.446580+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:13:03.456150+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:13:03.456486+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:13:18.609532+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:13:18.610239+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:13:18.983784+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:13:18.990440+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:13:18.990614+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:13:31.315035+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:13:31.315548+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:13:32.682047+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:13:32.688719+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:13:32.688890+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:10.395835+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:10.398076+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:10.846315+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:10.854925+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:10.855085+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:12.164735+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:12.165475+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:12.503732+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:12.510061+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:12.510219+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.016861+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.017891+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.397746+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.404678+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.404864+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.909145+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:13.910219+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:14.280045+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:14.286207+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:14.286365+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:14.792676+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:14.793721+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:15.160193+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:15.166468+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:15.166636+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:19.913812+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:19.914741+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:20.287421+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:20.293826+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:20.293987+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:20.638117+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:20.644381+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:20.647800+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:23.579546+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:23.579927+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:23.946251+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:23.952889+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:23.953050+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.124906+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.125403+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.479015+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.485740+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.485967+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.687825+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:31.688255+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:32.047462+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:32.053586+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:32.053745+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:41.551501+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:41.552040+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:41.938760+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:41.945533+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:41.945714+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:50.935016+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T22:59:50.935433+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T22:59:51.295258+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T22:59:51.301876+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T22:59:51.302042+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:02.415016+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:00:02.415793+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:00:02.771298+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:00:02.778265+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:02.778588+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:12.074194+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:00:12.074604+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:00:12.446549+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:00:12.453837+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:12.454082+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:15.281528+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:00:15.282057+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:00:15.644060+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:00:15.651033+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:15.651244+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:34.238610+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:00:34.239297+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:00:34.596260+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:00:34.602661+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:34.602845+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:44.711266+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:00:44.712147+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:00:45.086815+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:00:45.093013+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:00:45.093170+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:01.084624+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:08:01.085167+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:08:01.460165+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:08:01.467029+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:01.467230+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:11.567315+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:08:11.567810+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:08:11.935985+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:08:11.942809+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:11.942987+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:48.503398+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:08:48.504170+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:08:48.870187+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:08:48.877066+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:48.877258+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:49.888219+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:08:49.888952+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:08:50.259225+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:08:50.266302+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:08:50.266506+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:09:11.674627+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:09:11.675374+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:09:12.050769+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:09:12.057505+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:09:12.057717+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:09:59.518473+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:09:59.519042+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:10:00.030693+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:10:00.041455+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:10:00.041853+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:10:48.316403+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:10:48.317062+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:10:48.689087+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:10:48.696035+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:10:48.696221+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:11:53.732092+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-30T23:11:53.732713+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-30T23:11:54.132587+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-30T23:11:54.144095+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-30T23:11:54.144472+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T04:41:55.105649+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T04:41:55.108758+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T04:41:55.671191+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T04:41:55.682990+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T04:41:55.683239+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T04:42:15.590236+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T04:42:15.590715+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T04:42:15.944387+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T04:42:15.950727+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T04:42:15.950903+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:27:51.869282+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:27:51.874132+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:27:52.388341+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:27:52.400611+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:27:52.401110+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:00.907206+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:00.907902+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:39:01.383692+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:39:01.393142+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:01.393499+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:13.916564+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:13.916935+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:39:14.383087+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:39:14.390128+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:14.390312+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:26.915899+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:26.916461+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:39:27.297290+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:39:27.305308+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:27.305548+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:37.910107+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:37.910561+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:39:38.284458+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:39:38.291645+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:38.291838+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:43.647304+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:43.647755+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:39:44.021759+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:39:44.028688+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:44.028897+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:49.583180+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:49.583737+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:39:49.955334+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:39:49.962217+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:49.962455+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:39:59.760433+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:39:59.761082+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:40:00.132705+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:40:00.139501+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:40:00.139732+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:40:04.586880+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:40:04.587271+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:40:04.952745+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:40:04.959625+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:40:04.959820+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:41:10.182562+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:41:10.183080+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:41:10.689690+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:41:10.699696+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:41:10.700066+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:41:55.129901+00:00", "level": "INFO", "logger": "api.main", "message": "Shutting down API server", "extra": {}}
+{"timestamp": "2025-12-31T05:41:55.130412+00:00", "level": "INFO", "logger": "api.main", "message": "Shutdown complete", "extra": {}}
+{"timestamp": "2025-12-31T05:41:55.604277+00:00", "level": "INFO", "logger": "api.main", "message": "Starting Editorial Assistant API v3.0", "extra": {}}
+{"timestamp": "2025-12-31T05:41:55.614575+00:00", "level": "INFO", "logger": "api.main", "message": "Database initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:41:55.614951+00:00", "level": "INFO", "logger": "api.main", "message": "LLM client initialized", "extra": {}}
+{"timestamp": "2025-12-31T05:42:09.821705+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: GET http://testserver/api/queue/?page=0 \"HTTP/1.1 422 Unprocessable Entity\"", "extra": {}}
+{"timestamp": "2025-12-31T05:42:09.822756+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: GET http://testserver/api/queue/?page_size=101 \"HTTP/1.1 422 Unprocessable Entity\"", "extra": {}}
+{"timestamp": "2025-12-31T05:42:09.824379+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: GET http://testserver/api/queue/?status=invalid_status \"HTTP/1.1 422 Unprocessable Entity\"", "extra": {}}

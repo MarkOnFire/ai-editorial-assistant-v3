@@ -13,6 +13,7 @@ class JobStatus(str, Enum):
     failed = "failed"
     cancelled = "cancelled"
     paused = "paused"
+    investigating = "investigating"  # Manager agent diagnosing failure
 
 
 class PhaseStatus(str, Enum):
@@ -39,6 +40,12 @@ class JobPhase(BaseModel):
     error_message: Optional[str] = None
     output_path: Optional[str] = Field(None, description="Path to phase output file if applicable")
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Phase-specific metadata")
+    # Tier tracking fields
+    model: Optional[str] = Field(None, description="Model used for this phase")
+    tier: Optional[int] = Field(None, description="Tier index (0=cheapskate, 1=default, 2=big-brain)")
+    tier_label: Optional[str] = Field(None, description="Human-readable tier name")
+    tier_reason: Optional[str] = Field(None, description="Why this tier was selected")
+    attempts: Optional[int] = Field(None, description="Number of attempts (>1 indicates escalation)")
 
     def is_complete(self) -> bool:
         """Check if phase completed successfully."""
@@ -63,8 +70,9 @@ class JobBase(BaseModel):
 
 class JobCreate(BaseModel):
     """Schema for creating a new job (POST /queue)."""
-    project_path: str = Field(..., description="Path to project directory")
-    transcript_file: str = Field(..., description="Path to transcript file")
+    project_name: str = Field(..., description="Name for this project (used for output folder)")
+    transcript_file: str = Field(..., description="Path to transcript file (relative to transcripts/)")
+    project_path: Optional[str] = Field(None, description="Output path (auto-generated if not provided)")
     priority: Optional[int] = Field(default=0, description="Job priority (higher = sooner)")
 
 
@@ -92,8 +100,19 @@ class JobUpdate(BaseModel):
     manifest_path: Optional[str] = None
     logs_path: Optional[str] = None
     last_heartbeat: Optional[datetime] = None
+    airtable_record_id: Optional[str] = None
+    airtable_url: Optional[str] = None
+    media_id: Optional[str] = None
     phases: Optional[List[JobPhase]] = Field(None, description="Replace all phases")
     phase_update: Optional[PhaseUpdate] = Field(None, description="Update a single phase")
+
+
+class JobOutputs(BaseModel):
+    """Output file references from job manifest."""
+    analysis: Optional[str] = None
+    formatted_transcript: Optional[str] = None
+    seo_metadata: Optional[str] = None
+    copy_edited: Optional[str] = None
 
 
 class Job(BaseModel):
@@ -122,6 +141,10 @@ class Job(BaseModel):
     manifest_path: Optional[str] = None
     logs_path: Optional[str] = None
     last_heartbeat: Optional[datetime] = None
+    airtable_record_id: Optional[str] = Field(None, description="Airtable record ID (e.g., 'recXXXXXXXXXXXXXX')")
+    airtable_url: Optional[str] = Field(None, description="Full URL to the Airtable record")
+    media_id: Optional[str] = Field(None, description="Extracted media ID from filename (e.g., '2WLI1209HD')")
+    outputs: Optional[JobOutputs] = Field(None, description="Output files from manifest")
 
     class Config:
         from_attributes = True

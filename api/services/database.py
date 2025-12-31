@@ -32,7 +32,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-from api.models.job import Job, JobCreate, JobUpdate, JobStatus, JobPhase, PhaseStatus
+from api.models.job import Job, JobCreate, JobUpdate, JobStatus, JobPhase, PhaseStatus, JobOutputs
 from api.models.events import SessionEvent, EventCreate, EventData, EventType
 from api.models.config import ConfigItem, ConfigValueType
 
@@ -68,6 +68,9 @@ jobs_table = Table(
     Column("logs_path", Text, nullable=True),
     Column("last_heartbeat", DateTime, nullable=True),
     Column("phases", Text, nullable=True),  # JSON array of JobPhase objects
+    Column("airtable_record_id", Text, nullable=True),
+    Column("airtable_url", Text, nullable=True),
+    Column("media_id", Text, nullable=True),
 )
 
 # Define session_stats table
@@ -165,6 +168,61 @@ async def get_session():
 
 
 # ============================================================================
+# Helper Functions for Path Sanitization
+# ============================================================================
+
+
+def sanitize_path_component(name: str) -> str:
+    """Sanitize a string for safe use as a filesystem path component.
+
+    Removes or replaces characters that are invalid in file paths across
+    different operating systems (/, \\, :, *, ?, ", <>, |).
+
+    Args:
+        name: The string to sanitize (e.g., project name)
+
+    Returns:
+        Sanitized string safe for use as a path component
+
+    Examples:
+        >>> sanitize_path_component("My Project: Part 1")
+        'My_Project_Part_1'
+        >>> sanitize_path_component("test/file\\name")
+        'test_file_name'
+        >>> sanitize_path_component("project<2024>")
+        'project_2024_'
+    """
+    if not name:
+        return "unnamed"
+
+    # Replace invalid characters with underscore
+    # Invalid chars: / \ : * ? " < > |
+    invalid_chars = r'/\:*?"<>|'
+    sanitized = "".join(
+        c if c.isalnum() or c in "-_. " else "_"
+        for c in name
+    )
+
+    # Replace multiple consecutive underscores with single underscore
+    while "__" in sanitized:
+        sanitized = sanitized.replace("__", "_")
+
+    # Remove leading/trailing underscores and spaces
+    sanitized = sanitized.strip("_ ")
+
+    # Ensure result is not empty
+    if not sanitized:
+        return "unnamed"
+
+    # Limit length to avoid filesystem issues (most systems support 255 chars)
+    max_length = 200  # Conservative limit
+    if len(sanitized) > max_length:
+        sanitized = sanitized[:max_length].rstrip("_ ")
+
+    return sanitized
+
+
+# ============================================================================
 # Job CRUD Operations
 # ============================================================================
 
@@ -179,23 +237,32 @@ async def create_job(job: JobCreate) -> Job:
         Complete Job record with generated ID and defaults
     """
     async with get_session() as session:
-        # Initialize phases from agent_phases
-        default_phases = ["analyst", "formatter"]
+        # Initialize phases - automated pipeline phases (manager is QA, copy_editor is interactive)
+        default_phases = ["analyst", "formatter", "seo", "manager"]
         initial_phases = [
             JobPhase(name=name, status=PhaseStatus.pending).model_dump()
             for name in default_phases
         ]
 
+        # Derive project_path from project_name if not provided
+        project_path = job.project_path
+        if project_path is None:
+            # Sanitize project name for filesystem using helper function
+            safe_name = sanitize_path_component(job.project_name)
+            output_dir = os.getenv("OUTPUT_DIR", "OUTPUT")
+            project_path = f"{output_dir}/{safe_name}"
+
         # Prepare values
+        # Note: agent_phases is a legacy field, phases is the new structured format
         values = {
-            "project_path": job.project_path,
+            "project_path": project_path,
             "transcript_file": job.transcript_file,
-            "priority": job.priority,
+            "priority": job.priority or 0,
             "status": JobStatus.pending.value,
             "queued_at": datetime.now(timezone.utc),
             "estimated_cost": 0.0,
             "actual_cost": 0.0,
-            "agent_phases": json.dumps(default_phases),
+            "agent_phases": json.dumps(default_phases),  # Legacy field
             "phases": json.dumps(initial_phases),
             "retry_count": 0,
             "max_retries": 3,
@@ -234,20 +301,57 @@ async def get_job(job_id: int) -> Optional[Job]:
         return _row_to_job(row)
 
 
+async def find_jobs_by_transcript(
+    transcript_file: str,
+    exclude_cancelled: bool = True,
+) -> List[Job]:
+    """Find existing jobs for a transcript file.
+
+    Used for duplicate detection - checks if a transcript has already been
+    processed or is currently in queue.
+
+    Args:
+        transcript_file: The transcript filename to search for
+        exclude_cancelled: Whether to exclude cancelled jobs (default: True)
+
+    Returns:
+        List of Job records matching the transcript file
+    """
+    async with get_session() as session:
+        stmt = select(jobs_table).where(
+            jobs_table.c.transcript_file == transcript_file
+        )
+
+        if exclude_cancelled:
+            stmt = stmt.where(jobs_table.c.status != JobStatus.cancelled.value)
+
+        # Order by newest first
+        stmt = stmt.order_by(jobs_table.c.queued_at.desc())
+
+        result = await session.execute(stmt)
+        rows = result.fetchall()
+
+        return [_row_to_job(row) for row in rows]
+
+
 async def list_jobs(
     status: Optional[JobStatus] = None,
     limit: int = 50,
     offset: int = 0,
+    search: Optional[str] = None,
+    sort_order: str = "newest",
 ) -> List[Job]:
-    """List jobs with optional filtering and pagination.
+    """List jobs with optional filtering, search, and pagination.
 
     Args:
         status: Filter by job status (None = all statuses)
         limit: Maximum number of jobs to return
         offset: Number of jobs to skip
+        search: Filter by transcript_file or project_path (case-insensitive contains)
+        sort_order: "newest" (default) or "oldest" - by queued_at timestamp
 
     Returns:
-        List of Job records ordered by priority desc, then ID
+        List of Job records
     """
     async with get_session() as session:
         stmt = select(jobs_table)
@@ -256,8 +360,19 @@ async def list_jobs(
         if status is not None:
             stmt = stmt.where(jobs_table.c.status == status.value)
 
-        # Order by priority (descending) then ID
-        stmt = stmt.order_by(desc(jobs_table.c.priority), jobs_table.c.id)
+        # Apply search filter (case-insensitive)
+        if search:
+            search_pattern = f"%{search}%"
+            stmt = stmt.where(
+                (jobs_table.c.transcript_file.ilike(search_pattern)) |
+                (jobs_table.c.project_path.ilike(search_pattern))
+            )
+
+        # Order by queued_at (newest or oldest first)
+        if sort_order == "oldest":
+            stmt = stmt.order_by(jobs_table.c.queued_at.asc(), jobs_table.c.id.asc())
+        else:  # newest first (default)
+            stmt = stmt.order_by(jobs_table.c.queued_at.desc(), jobs_table.c.id.desc())
 
         # Apply pagination
         stmt = stmt.limit(limit).offset(offset)
@@ -266,6 +381,36 @@ async def list_jobs(
         rows = result.fetchall()
 
         return [_row_to_job(row) for row in rows]
+
+
+async def count_jobs(
+    status: Optional[JobStatus] = None,
+    search: Optional[str] = None,
+) -> int:
+    """Count jobs matching filter criteria.
+
+    Args:
+        status: Filter by job status (None = all statuses)
+        search: Filter by transcript_file or project_path
+
+    Returns:
+        Count of matching jobs
+    """
+    async with get_session() as session:
+        stmt = select(func.count()).select_from(jobs_table)
+
+        if status is not None:
+            stmt = stmt.where(jobs_table.c.status == status.value)
+
+        if search:
+            search_pattern = f"%{search}%"
+            stmt = stmt.where(
+                (jobs_table.c.transcript_file.ilike(search_pattern)) |
+                (jobs_table.c.project_path.ilike(search_pattern))
+            )
+
+        result = await session.execute(stmt)
+        return result.scalar() or 0
 
 
 async def update_job(job_id: int, job_update: JobUpdate) -> Optional[Job]:
@@ -316,6 +461,15 @@ async def update_job(job_id: int, job_update: JobUpdate) -> Optional[Job]:
 
         if job_update.last_heartbeat is not None:
             update_values["last_heartbeat"] = job_update.last_heartbeat
+
+        if job_update.airtable_record_id is not None:
+            update_values["airtable_record_id"] = job_update.airtable_record_id
+
+        if job_update.airtable_url is not None:
+            update_values["airtable_url"] = job_update.airtable_url
+
+        if job_update.media_id is not None:
+            update_values["media_id"] = job_update.media_id
 
         # Handle phases update (replaces all phases)
         if job_update.phases is not None:
@@ -394,6 +548,25 @@ async def delete_job(job_id: int) -> bool:
         return result.rowcount > 0
 
 
+async def bulk_delete_jobs_by_status(statuses: List[JobStatus]) -> int:
+    """Delete all jobs with the given statuses.
+
+    Args:
+        statuses: List of job statuses to delete
+
+    Returns:
+        Number of jobs deleted
+    """
+    if not statuses:
+        return 0
+
+    async with get_session() as session:
+        status_values = [s.value for s in statuses]
+        stmt = delete(jobs_table).where(jobs_table.c.status.in_(status_values))
+        result = await session.execute(stmt)
+        return result.rowcount
+
+
 async def update_job_status(
     job_id: int,
     status: JobStatus,
@@ -469,9 +642,10 @@ async def update_job_phase(job_id: int, phases: list) -> Optional[Job]:
 
 
 async def get_next_pending_job() -> Optional[Job]:
-    """Get the next pending job to process.
+    """Get the next pending job to process (non-atomic, for read-only queries).
 
     Returns highest priority pending job, or earliest queued if priorities equal.
+    WARNING: Use claim_next_job() for worker processing to avoid race conditions.
 
     Returns:
         Next job to process or None if queue is empty
@@ -489,6 +663,60 @@ async def get_next_pending_job() -> Optional[Job]:
         if row is None:
             return None
 
+        return _row_to_job(row)
+
+
+async def claim_next_job(worker_id: Optional[str] = None) -> Optional[Job]:
+    """Atomically claim the next pending job for processing.
+
+    Uses a single UPDATE statement to prevent race conditions when multiple
+    workers are running. The job is marked as in_progress and started_at
+    is set in one atomic operation.
+
+    Args:
+        worker_id: Optional identifier for the worker claiming the job.
+                   Useful for debugging and monitoring which worker has which job.
+
+    Returns:
+        The claimed job (now in_progress) or None if no pending jobs.
+    """
+    from sqlalchemy import text
+
+    async with get_session() as session:
+        now = datetime.now(timezone.utc)
+
+        # SQLite-compatible atomic claim using UPDATE with subquery
+        # This finds the next job and claims it in a single statement
+        claim_sql = text("""
+            UPDATE jobs
+            SET status = :new_status,
+                started_at = :started_at,
+                last_heartbeat = :heartbeat
+            WHERE id = (
+                SELECT id FROM jobs
+                WHERE status = :pending_status
+                ORDER BY priority DESC, queued_at ASC
+                LIMIT 1
+            )
+            RETURNING *
+        """)
+
+        result = await session.execute(
+            claim_sql,
+            {
+                "new_status": JobStatus.in_progress.value,
+                "pending_status": JobStatus.pending.value,
+                "started_at": now.isoformat(),
+                "heartbeat": now.isoformat(),
+            }
+        )
+
+        row = result.fetchone()
+        if row is None:
+            return None
+
+        # Convert the raw row to a Job model
+        # RETURNING * gives us columns in table definition order
         return _row_to_job(row)
 
 
@@ -840,7 +1068,7 @@ def _row_to_job(row) -> Job:
     """Convert database row to Job model.
 
     Handles JSON deserialization for agent_phases and phases fields,
-    derives project_name from project_path.
+    derives project_name from project_path, and loads outputs from manifest.
     """
     # Parse agent_phases JSON
     agent_phases = json.loads(row.agent_phases)
@@ -856,6 +1084,18 @@ def _row_to_job(row) -> Job:
 
     # Derive project_name from project_path
     project_name = os.path.basename(row.project_path.rstrip('/'))
+
+    # Load outputs from manifest.json if it exists
+    outputs = None
+    manifest_path = os.path.join(row.project_path, "manifest.json")
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path, 'r') as f:
+                manifest = json.load(f)
+                if "outputs" in manifest:
+                    outputs = JobOutputs(**manifest["outputs"])
+        except (json.JSONDecodeError, IOError):
+            pass  # Ignore errors reading manifest
 
     return Job(
         id=row.id,
@@ -879,6 +1119,10 @@ def _row_to_job(row) -> Job:
         manifest_path=row.manifest_path,
         logs_path=row.logs_path,
         last_heartbeat=row.last_heartbeat,
+        airtable_record_id=getattr(row, 'airtable_record_id', None),
+        airtable_url=getattr(row, 'airtable_url', None),
+        media_id=getattr(row, 'media_id', None),
+        outputs=outputs,
     )
 
 
@@ -916,5 +1160,6 @@ def _row_to_config(row) -> ConfigItem:
 # Convenience Aliases for Worker
 # ============================================================================
 
-get_next_job = get_next_pending_job
+# Legacy alias - prefer claim_next_job for worker use
+get_next_job = claim_next_job
 update_job_heartbeat = update_heartbeat

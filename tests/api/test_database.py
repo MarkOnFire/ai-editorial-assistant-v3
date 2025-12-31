@@ -23,6 +23,7 @@ from api.services.database import (
     get_config,
     set_config,
     list_config,
+    sanitize_path_component,
 )
 from api.models.job import JobCreate, JobUpdate, JobStatus
 from api.models.events import EventCreate, EventType, EventData
@@ -518,3 +519,153 @@ async def test_run_stuck_job_cleanup(test_db):
     assert job1.id in summary["job_ids"]
     assert job2.id in summary["job_ids"]
     assert job3.id in summary["job_ids"]
+
+
+# ============================================================================
+# Path Sanitization Tests
+# ============================================================================
+
+
+def test_sanitize_path_component_basic():
+    """Test basic sanitization of valid names."""
+    assert sanitize_path_component("simple") == "simple"
+    assert sanitize_path_component("with-dashes") == "with-dashes"
+    assert sanitize_path_component("with_underscores") == "with_underscores"
+    assert sanitize_path_component("WithCaps123") == "WithCaps123"
+
+
+def test_sanitize_path_component_invalid_chars():
+    """Test sanitization removes/replaces invalid filesystem characters."""
+    # Forward slash
+    assert sanitize_path_component("test/project") == "test_project"
+
+    # Backslash
+    assert sanitize_path_component("test\\project") == "test_project"
+
+    # Colon
+    assert sanitize_path_component("project:v1") == "project_v1"
+
+    # Asterisk
+    assert sanitize_path_component("test*file") == "test_file"
+
+    # Question mark
+    assert sanitize_path_component("what?") == "what_"
+
+    # Double quotes
+    assert sanitize_path_component('test"name"') == "test_name_"
+
+    # Angle brackets
+    assert sanitize_path_component("project<2024>") == "project_2024_"
+
+    # Pipe
+    assert sanitize_path_component("test|name") == "test_name"
+
+
+def test_sanitize_path_component_multiple_invalid():
+    """Test sanitization with multiple invalid characters."""
+    result = sanitize_path_component('test/file\\name:v1*2?')
+    assert result == "test_file_name_v1_2_"
+
+    # Complex real-world example
+    result = sanitize_path_component("My Project: Episode 1/Part 2 <Draft>")
+    assert result == "My_Project_Episode_1_Part_2_Draft_"
+
+
+def test_sanitize_path_component_consecutive_underscores():
+    """Test that multiple consecutive underscores are collapsed."""
+    assert sanitize_path_component("test___file") == "test_file"
+    assert sanitize_path_component("a//b\\\\c") == "a_b_c"
+    assert sanitize_path_component("test::project") == "test_project"
+
+
+def test_sanitize_path_component_leading_trailing():
+    """Test that leading/trailing underscores and spaces are removed."""
+    assert sanitize_path_component("_test_") == "test"
+    assert sanitize_path_component(" test ") == "test"
+    assert sanitize_path_component("___test___") == "test"
+    assert sanitize_path_component("/test/") == "test"
+
+
+def test_sanitize_path_component_spaces():
+    """Test that spaces are preserved (but trimmed from ends)."""
+    assert sanitize_path_component("My Project Name") == "My Project Name"
+    assert sanitize_path_component("  spaced  ") == "spaced"
+
+
+def test_sanitize_path_component_empty():
+    """Test that empty or invalid-only strings return 'unnamed'."""
+    assert sanitize_path_component("") == "unnamed"
+    assert sanitize_path_component("   ") == "unnamed"
+    assert sanitize_path_component("///") == "unnamed"
+    assert sanitize_path_component(":::") == "unnamed"
+    assert sanitize_path_component("***") == "unnamed"
+
+
+def test_sanitize_path_component_length_limit():
+    """Test that very long names are truncated."""
+    long_name = "a" * 250
+    result = sanitize_path_component(long_name)
+    assert len(result) == 200
+    assert result == "a" * 200
+
+    # Test truncation with trailing underscore
+    long_name_with_special = "a" * 199 + "_" * 10
+    result = sanitize_path_component(long_name_with_special)
+    assert len(result) <= 200
+    assert not result.endswith("_")
+
+
+def test_sanitize_path_component_unicode():
+    """Test handling of unicode characters."""
+    # Non-ASCII characters should be replaced with underscore
+    assert sanitize_path_component("café") == "caf_"
+    assert sanitize_path_component("test™") == "test_"
+    # Pure unicode becomes underscore, then "unnamed" after strip
+    result = sanitize_path_component("日本語")
+    assert result == "unnamed"
+
+
+def test_sanitize_path_component_special_cases():
+    """Test edge cases and special scenarios."""
+    # Dots are allowed
+    assert sanitize_path_component("file.name") == "file.name"
+    assert sanitize_path_component("v1.2.3") == "v1.2.3"
+
+    # Mixed valid and invalid
+    assert sanitize_path_component("test-file_v1.2") == "test-file_v1.2"
+
+    # Real PBS project name examples
+    assert sanitize_path_component("WPT News 2024-03-15") == "WPT News 2024-03-15"
+    assert sanitize_path_component("University Place: Episode #123") == "University_Place_Episode_123"
+
+
+@pytest.mark.asyncio
+async def test_create_job_with_sanitized_project_name(test_db):
+    """Test that create_job properly sanitizes project names when deriving paths."""
+    # Create job without explicit project_path (will be derived from project_name)
+    job_create = JobCreate(
+        project_name="Test Project: Episode 1/Part 2",
+        transcript_file="/transcripts/test.txt",
+    )
+
+    job = await create_job(job_create)
+
+    # Verify the project_path was sanitized
+    assert job.project_path == "OUTPUT/Test_Project_Episode_1_Part_2"
+    assert "/" not in job.project_name  # project_name is derived from path
+
+
+@pytest.mark.asyncio
+async def test_create_job_with_explicit_path_no_sanitization(test_db):
+    """Test that explicit project_path is not sanitized (user responsibility)."""
+    # When user provides explicit path, we don't sanitize it
+    job_create = JobCreate(
+        project_name="Test Project",
+        project_path="/custom/path/with/slashes",
+        transcript_file="/transcripts/test.txt",
+    )
+
+    job = await create_job(job_create)
+
+    # Explicit path is preserved as-is
+    assert job.project_path == "/custom/path/with/slashes"

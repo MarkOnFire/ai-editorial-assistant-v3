@@ -3,7 +3,11 @@
 Provides endpoints for job detail retrieval, updates, and control operations.
 """
 
+import os
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import PlainTextResponse
 from typing import List
 
 from api.models.job import Job, JobUpdate, JobStatus
@@ -239,3 +243,68 @@ async def get_job_events(job_id: int):
     events = await get_events_for_job(job_id)
 
     return events
+
+
+@router.get("/{job_id}/outputs/{filename}")
+async def get_job_output(job_id: int, filename: str):
+    """Retrieve an output file for a specific job.
+
+    Returns the contents of a generated output file (markdown, json, etc.).
+    File must exist in the job's output directory.
+
+    Args:
+        job_id: Job ID to get output for
+        filename: Name of the output file (e.g., analyst_output.md)
+
+    Returns:
+        File contents as plain text
+
+    Raises:
+        HTTPException: 404 if job or file not found, 400 if invalid filename
+    """
+    # Verify job exists
+    job = await get_job(job_id)
+
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+
+    # Security: only allow specific safe filenames
+    allowed_files = {
+        "analyst_output.md",
+        "formatter_output.md",
+        "seo_output.md",
+        "manager_output.md",
+        "copy_editor_output.md",
+        "recovery_analysis.md",
+        "manifest.json",
+    }
+
+    if filename not in allowed_files:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid filename. Allowed files: {', '.join(sorted(allowed_files))}"
+        )
+
+    # Build path to output file
+    if not job.project_path:
+        raise HTTPException(
+            status_code=404,
+            detail="Job has no output directory configured"
+        )
+
+    file_path = Path(job.project_path) / filename
+
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Output file '{filename}' not found for job {job_id}"
+        )
+
+    # Read and return file contents
+    content = file_path.read_text(encoding="utf-8")
+
+    # Determine content type
+    if filename.endswith(".json"):
+        return PlainTextResponse(content, media_type="application/json")
+    else:
+        return PlainTextResponse(content, media_type="text/markdown")

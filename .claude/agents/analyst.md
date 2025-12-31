@@ -14,6 +14,20 @@ You receive a raw transcript file (SRT or plain text format) containing:
 - Visual descriptions (if present)
 - Captions and on-screen text
 
+### Media ID Reference
+
+The transcript filename contains a **Media ID prefix** that identifies the source program. See `knowledge/Media ID Prefixes.md` for the full lookup table.
+
+**Examples:**
+- `2WLI1234HD.srt` → **Wisconsin Life** (prefix `2WLI`)
+- `9UNP2005HD.txt` → **University Place** (prefix `9UNP`)
+- `2HNW0512.txt` → **Here and Now** (prefix `2HNW`)
+
+Use the Media ID to:
+1. Identify the **Program** field in your output
+2. Apply program-specific context (e.g., Wisconsin Life is short-form documentary, University Place is long-form lecture)
+3. Match with metadata in the Airtable Single Source of Truth (same Media ID)
+
 ## Output
 
 You produce a brainstorming document saved as:

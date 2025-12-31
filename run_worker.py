@@ -4,17 +4,37 @@
 Usage:
     ./venv/bin/python run_worker.py
 
-Or with custom options:
-    ./venv/bin/python run_worker.py --poll-interval 60 --heartbeat-interval 30
+With custom options:
+    ./venv/bin/python run_worker.py --poll-interval 60 --concurrent 3
+
+Run multiple workers for parallel processing:
+    ./venv/bin/python run_worker.py --worker-id worker-1 --concurrent 2 &
+    ./venv/bin/python run_worker.py --worker-id worker-2 --concurrent 2 &
 """
 import argparse
 import asyncio
 import signal
 import sys
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
 from api.services.worker import JobWorker, WorkerConfig
 from api.services.database import init_db, close_db
 from api.services.llm import get_llm_client, close_llm_client
+import json
+from pathlib import Path
+
+
+def load_worker_defaults() -> dict:
+    """Load worker defaults from config file."""
+    config_path = Path("config/llm-config.json")
+    if config_path.exists():
+        with open(config_path) as f:
+            config = json.load(f)
+            return config.get("worker", {})
+    return {}
 
 
 async def main(args):
@@ -25,11 +45,26 @@ async def main(args):
     # Initialize LLM client
     get_llm_client()
 
-    # Create worker config
+    # Load defaults from config file
+    defaults = load_worker_defaults()
+
+    # Create worker config (CLI args override config file defaults)
+    # Use None as sentinel to detect if CLI arg was provided
     config = WorkerConfig(
-        poll_interval=args.poll_interval,
-        heartbeat_interval=args.heartbeat_interval,
-        max_retries=args.max_retries,
+        poll_interval=(
+            args.poll_interval if args.poll_interval is not None
+            else defaults.get("poll_interval_seconds", 5)
+        ),
+        heartbeat_interval=(
+            args.heartbeat_interval if args.heartbeat_interval is not None
+            else defaults.get("heartbeat_interval_seconds", 60)
+        ),
+        max_retries=args.max_retries if args.max_retries is not None else 3,
+        max_concurrent_jobs=(
+            args.concurrent if args.concurrent is not None
+            else defaults.get("max_concurrent_jobs", 3)
+        ),
+        worker_id=args.worker_id,
     )
 
     # Create and start worker
@@ -46,11 +81,13 @@ async def main(args):
         loop.add_signal_handler(sig, shutdown_handler)
 
     try:
-        print("[Worker] Starting Editorial Assistant job worker...")
-        print(f"[Worker] Poll interval: {args.poll_interval}s")
-        print(f"[Worker] Heartbeat interval: {args.heartbeat_interval}s")
-        print(f"[Worker] Max retries: {args.max_retries}")
-        print("[Worker] Press Ctrl+C to stop")
+        worker_id = config.worker_id
+        print(f"[{worker_id}] Starting Editorial Assistant job worker...")
+        print(f"[{worker_id}] Poll interval: {config.poll_interval}s")
+        print(f"[{worker_id}] Heartbeat interval: {config.heartbeat_interval}s")
+        print(f"[{worker_id}] Concurrent jobs: {config.max_concurrent_jobs}")
+        print(f"[{worker_id}] Max retries: {config.max_retries}")
+        print(f"[{worker_id}] Press Ctrl+C to stop")
         print()
 
         await worker.start()
@@ -68,20 +105,32 @@ if __name__ == "__main__":
     parser.add_argument(
         "--poll-interval",
         type=int,
-        default=30,
-        help="Seconds between queue polling (default: 30)",
+        default=None,
+        help="Seconds between queue polling (default: from config file, fallback: 5)",
     )
     parser.add_argument(
         "--heartbeat-interval",
         type=int,
-        default=60,
-        help="Seconds between heartbeat updates (default: 60)",
+        default=None,
+        help="Seconds between heartbeat updates (default: from config file, fallback: 60)",
     )
     parser.add_argument(
         "--max-retries",
         type=int,
-        default=3,
+        default=None,
         help="Maximum retry attempts for failed jobs (default: 3)",
+    )
+    parser.add_argument(
+        "--concurrent",
+        type=int,
+        default=None,
+        help="Maximum concurrent jobs to process (default: from config file, fallback: 3)",
+    )
+    parser.add_argument(
+        "--worker-id",
+        type=str,
+        default=None,
+        help="Unique worker identifier (default: worker-{pid})",
     )
 
     args = parser.parse_args()

@@ -43,13 +43,22 @@ class TokenCostTooHighError(Exception):
 # Pricing per 1M tokens (input/output) - updated Dec 2024
 # These are fallback values; OpenRouter returns actual costs
 MODEL_PRICING: Dict[str, Dict[str, float]] = {
+    # OpenRouter free tier models (cheapskate preset)
+    "xiaomi/mimo-v2-flash:free": {"input": 0.0, "output": 0.0},
+    "mistralai/devstral-2-2512:free": {"input": 0.0, "output": 0.0},
+    "deepseek/deepseek-r1-0528:free": {"input": 0.0, "output": 0.0},
     # OpenRouter models
     "google/gemini-2.0-flash-exp": {"input": 0.0, "output": 0.0},  # Free during preview
     "google/gemini-2.5-flash": {"input": 0.15, "output": 0.60},
+    "google/gemini-3-flash-preview": {"input": 0.15, "output": 0.60},
+    "google/gemini-3-pro-preview": {"input": 1.25, "output": 5.00},
     "google/gemini-pro-1.5": {"input": 1.25, "output": 5.00},
     "anthropic/claude-3.5-sonnet": {"input": 3.00, "output": 15.00},
+    "anthropic/claude-sonnet-4.5": {"input": 3.00, "output": 15.00},
     "openai/gpt-4o": {"input": 2.50, "output": 10.00},
     "openai/gpt-4o-mini": {"input": 0.15, "output": 0.60},
+    "xai/grok-4.1-fast": {"input": 2.00, "output": 8.00},
+    "moonshotai/kimi-k2-0711:free": {"input": 0.0, "output": 0.0},
     # Direct API models
     "gpt-4o": {"input": 2.50, "output": 10.00},
     "gpt-4o-mini": {"input": 0.15, "output": 0.60},
@@ -356,17 +365,159 @@ class LLMClient:
 
         return backends[backend_name]
 
-    def get_backend_for_phase(self, phase: str) -> str:
+    def get_backend_for_phase(
+        self,
+        phase: str,
+        context: Optional[Dict[str, Any]] = None,
+        tier_override: Optional[int] = None
+    ) -> str:
         """Get the configured backend for a specific agent phase.
+
+        Supports tiered routing based on transcript duration and explicit tier override.
 
         Args:
             phase: Phase name (e.g., 'analyst', 'formatter', 'seo', 'copy_editor')
+            context: Optional context dict with transcript_metrics
+            tier_override: Optional tier index to use instead of calculated tier
 
         Returns:
             Backend name to use for this phase
         """
+        routing_config = self.config.get("routing", {})
+        tiers = routing_config.get("tiers", ["openrouter-cheapskate", "openrouter", "openrouter-big-brain"])
+
+        # Get base tier for this phase (default to tier 0 = cheapskate)
+        phase_base_tiers = routing_config.get("phase_base_tiers", {})
+        base_tier = phase_base_tiers.get(phase, 0)
+
+        # If tier override provided, use it directly
+        if tier_override is not None:
+            selected_tier = min(tier_override, len(tiers) - 1)
+        else:
+            # Calculate tier based on transcript duration
+            selected_tier = base_tier
+
+            if context:
+                transcript_metrics = context.get("transcript_metrics", {})
+                estimated_duration = transcript_metrics.get("estimated_duration_minutes", 0)
+
+                # Find appropriate tier based on duration thresholds
+                duration_thresholds = routing_config.get("duration_thresholds", [])
+                for threshold in duration_thresholds:
+                    max_minutes = threshold.get("max_minutes")
+                    tier = threshold.get("tier", 0)
+
+                    if max_minutes is None or estimated_duration <= max_minutes:
+                        # Use the higher of base tier or duration-based tier
+                        selected_tier = max(base_tier, tier)
+                        break
+                else:
+                    # No threshold matched, use max tier
+                    selected_tier = max(base_tier, len(tiers) - 1)
+
+        # Get backend for selected tier
+        if selected_tier < len(tiers):
+            backend = tiers[selected_tier]
+            # Validate backend exists
+            if backend in self.config.get("backends", {}):
+                return backend
+
+        # Fall back to phase_backends config or primary backend
         phase_backends = self.config.get("phase_backends", {})
         return phase_backends.get(phase, self.config.get("primary_backend", "openrouter"))
+
+    def get_tier_for_phase(
+        self,
+        phase: str,
+        context: Optional[Dict[str, Any]] = None
+    ) -> int:
+        """Get the calculated tier index for a phase based on context.
+
+        Args:
+            phase: Phase name
+            context: Optional context dict with transcript_metrics
+
+        Returns:
+            Tier index (0 = cheapskate, 1 = default, 2 = big-brain)
+        """
+        tier, _ = self.get_tier_for_phase_with_reason(phase, context)
+        return tier
+
+    def get_tier_for_phase_with_reason(
+        self,
+        phase: str,
+        context: Optional[Dict[str, Any]] = None
+    ) -> tuple:
+        """Get the calculated tier index and reason for a phase.
+
+        Args:
+            phase: Phase name
+            context: Optional context dict with transcript_metrics
+
+        Returns:
+            Tuple of (tier index, reason string)
+        """
+        routing_config = self.config.get("routing", {})
+        tiers = routing_config.get("tiers", ["openrouter-cheapskate", "openrouter", "openrouter-big-brain"])
+
+        # Get base tier for this phase
+        phase_base_tiers = routing_config.get("phase_base_tiers", {})
+        base_tier = phase_base_tiers.get(phase, 0)
+
+        if not context:
+            return base_tier, f"phase default (base tier {base_tier})"
+
+        transcript_metrics = context.get("transcript_metrics", {})
+        estimated_duration = transcript_metrics.get("estimated_duration_minutes", 0)
+
+        # Find appropriate tier based on duration thresholds
+        duration_thresholds = routing_config.get("duration_thresholds", [])
+        for threshold in duration_thresholds:
+            max_minutes = threshold.get("max_minutes")
+            tier = threshold.get("tier", 0)
+
+            if max_minutes is None or estimated_duration <= max_minutes:
+                selected_tier = max(base_tier, tier)
+                if selected_tier > base_tier:
+                    reason = f"duration {estimated_duration:.0f}min (threshold: ≤{max_minutes}min → tier {tier})"
+                else:
+                    reason = f"phase default (base tier {base_tier})"
+                return selected_tier, reason
+
+        # No threshold matched, use max tier
+        max_tier = len(tiers) - 1
+        return max(base_tier, max_tier), f"duration {estimated_duration:.0f}min exceeds all thresholds"
+
+    def get_next_tier(self, current_tier: int) -> Optional[int]:
+        """Get the next escalation tier, or None if at max.
+
+        Args:
+            current_tier: Current tier index
+
+        Returns:
+            Next tier index, or None if already at max
+        """
+        routing_config = self.config.get("routing", {})
+        tiers = routing_config.get("tiers", ["openrouter-cheapskate", "openrouter", "openrouter-big-brain"])
+
+        if current_tier < len(tiers) - 1:
+            return current_tier + 1
+        return None
+
+    def get_escalation_config(self) -> Dict[str, Any]:
+        """Get escalation configuration.
+
+        Returns:
+            Dict with escalation settings (enabled, on_failure, on_timeout, etc.)
+        """
+        routing_config = self.config.get("routing", {})
+        return routing_config.get("escalation", {
+            "enabled": True,
+            "on_failure": True,
+            "on_timeout": True,
+            "timeout_seconds": 120,
+            "max_retries_per_tier": 1
+        })
 
     def get_api_key(self, backend_config: Dict[str, Any]) -> Optional[str]:
         """Get API key for a backend from environment."""
@@ -511,8 +662,12 @@ class LLMClient:
         if "usage" in data and "total_cost" in data["usage"]:
             openrouter_cost = data["usage"]["total_cost"]
 
-        # Calculate cost
-        cost = calculate_cost(model, input_tokens, output_tokens, openrouter_cost)
+        # Calculate cost (force $0 for free tier models)
+        actual_model = data.get("model", model)
+        if actual_model.endswith(":free"):
+            cost = 0.0
+        else:
+            cost = calculate_cost(actual_model, input_tokens, output_tokens, openrouter_cost)
 
         # Extract content
         content = data["choices"][0]["message"]["content"]

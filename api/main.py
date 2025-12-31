@@ -10,6 +10,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.services import database
 from api.services.llm import get_llm_client, close_llm_client
+from api.services.logging import setup_logging, get_logger
+
+
+# Initialize logging for API
+setup_logging(log_file="api.log")
+logger = get_logger(__name__)
 
 
 @asynccontextmanager
@@ -20,12 +26,17 @@ async def lifespan(app: FastAPI):
     closes connections on shutdown.
     """
     # Startup: Initialize database and LLM client
+    logger.info("Starting Editorial Assistant API v3.0")
     await database.init_db()
+    logger.info("Database initialized")
     get_llm_client()  # Initialize LLM client
+    logger.info("LLM client initialized")
     yield
     # Shutdown: Close connections
+    logger.info("Shutting down API server")
     await close_llm_client()
     await database.close_db()
+    logger.info("Shutdown complete")
 
 
 app = FastAPI(
@@ -97,12 +108,12 @@ async def health():
 
 
 # Register routers
-from api.routers import jobs, queue
+from api.routers import jobs, queue, config
 app.include_router(queue.router, prefix="/api/queue", tags=["queue"])
 app.include_router(jobs.router, prefix="/api/jobs", tags=["jobs"])
+app.include_router(config.router, prefix="/api", tags=["config"])
 
 # Additional routers will be added here as they're implemented:
-# from api.routers import system, config, analytics
+# from api.routers import system, analytics
 # app.include_router(system.router, prefix="/api/system", tags=["system"])
-# app.include_router(config.router, prefix="/api/config", tags=["config"])
 # app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])

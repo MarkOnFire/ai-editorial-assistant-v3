@@ -3,7 +3,9 @@
 Provides timezone-aware datetime handling and common utilities.
 """
 
+import re
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional
 
 
@@ -114,3 +116,86 @@ def parse_iso_datetime(s: str) -> datetime:
 
     # Ensure result is UTC-aware
     return ensure_utc(dt)
+
+
+def calculate_transcript_metrics(
+    transcript_content: str,
+    words_per_minute: int = 150,
+    long_form_threshold_minutes: int = 15
+) -> dict:
+    """Calculate metrics from transcript content for routing decisions.
+
+    Args:
+        transcript_content: Raw transcript text
+        words_per_minute: Speaking rate estimate (default 150 wpm)
+        long_form_threshold_minutes: Minutes threshold for long-form classification
+
+    Returns:
+        Dict with word_count, estimated_duration_minutes, is_long_form
+
+    Examples:
+        >>> metrics = calculate_transcript_metrics("Hello world " * 1000)
+        >>> metrics["word_count"]
+        2000
+        >>> metrics["estimated_duration_minutes"]  # 2000 / 150 = 13.33
+        13.33
+        >>> metrics["is_long_form"]
+        False
+
+        >>> metrics = calculate_transcript_metrics("Hello world " * 2500)
+        >>> metrics["is_long_form"]  # 5000 words / 150 wpm = 33.33 min
+        True
+    """
+    # Count words (simple split on whitespace)
+    words = transcript_content.split()
+    word_count = len(words)
+
+    # Estimate duration based on speaking rate
+    estimated_duration_minutes = round(word_count / words_per_minute, 2)
+
+    # Classify as long-form if exceeds threshold
+    is_long_form = estimated_duration_minutes > long_form_threshold_minutes
+
+    return {
+        "word_count": word_count,
+        "estimated_duration_minutes": estimated_duration_minutes,
+        "is_long_form": is_long_form,
+    }
+
+
+def extract_media_id(filename: str) -> str:
+    """Extract Media ID from transcript filename.
+
+    Removes common suffixes and extensions to extract the core media identifier.
+    Handles PBS Wisconsin naming conventions including _ForClaude suffix,
+    revision date suffixes (_REV\d+), and standard file extensions.
+
+    Args:
+        filename: Transcript filename (with or without extension)
+
+    Returns:
+        Extracted media ID (base filename without suffixes/extensions)
+
+    Examples:
+        >>> extract_media_id("2WLI1209HD_ForClaude.txt")
+        '2WLI1209HD'
+        >>> extract_media_id("9UNP2005HD.srt")
+        '9UNP2005HD'
+        >>> extract_media_id("2BUC0000HDWEB02_REV20251202.srt")
+        '2BUC0000HDWEB02'
+        >>> extract_media_id("Some_Project_Name.txt")
+        'Some_Project_Name'
+        >>> extract_media_id("2WLI1209HD_ForClaude_REV20251202.txt")
+        '2WLI1209HD'
+    """
+    # Get filename without path
+    base_name = Path(filename).name
+
+    # Remove extension
+    stem = Path(base_name).stem
+
+    # Remove all known suffixes (can appear in any combination)
+    # Pattern matches: _ForClaude, _REV followed by digits, or both
+    stem = re.sub(r'(_ForClaude)?(_REV\d+)?$', '', stem, flags=re.IGNORECASE)
+
+    return stem
