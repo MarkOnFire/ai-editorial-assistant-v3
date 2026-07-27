@@ -397,6 +397,11 @@ def classify(instance: dict, raw: RawProbes, *, now: Optional[datetime] = None) 
                     )
 
     # --- Overall verdict ---
+    # Deliberate: only a DOWN *API* makes the instance DOWN. A dead worker/web/watcher on a
+    # still-answering API is DEGRADED, not DOWN — the box is reachable and inspectable, and
+    # calling it DOWN would send an operator chasing a host that is in fact up. Note this is
+    # per-instance; `_fleet_verdict` separately reports DOWN when every instance is down.
+    # Exit-code contract is unaffected either way (0 iff all instances are UP).
     downgraders = [worker.state, web.state]
     if watcher_required:
         downgraders.append(watcher.state)
@@ -621,7 +626,13 @@ def main() -> None:
 
     instances = load_instances(args.config, args.url, args.api_key_env)
 
-    if args.watch:
+    # `is not None`, not truthiness: --watch 0 parses to 0.0, which is falsy and would
+    # otherwise fall through to one-shot mode without saying so. A non-positive interval
+    # is a user error (it would spin the probe loop with no delay), so reject it outright.
+    if args.watch is not None:
+        if args.watch <= 0:
+            print(f"--watch needs a positive interval in seconds (got {args.watch:g}).", file=sys.stderr)
+            sys.exit(2)
         if not _rich_available():
             print("--watch needs the 'rich' package (pip install rich).", file=sys.stderr)
             sys.exit(2)

@@ -119,9 +119,7 @@ def test_health_endpoint_exposes_instance_block():
         return {
             "api_restarted_at": _cfg("2026-07-23T00:00:00+00:00"),
             "version_deployed_at": _cfg("2026-07-20T00:00:00+00:00"),
-        }.get(
-            key
-        )  # llm_runtime_status → None (falls back to in-process status)
+        }.get(key)  # llm_runtime_status → None (falls back to in-process status)
 
     mock_client = MagicMock()
     mock_client.get_status.return_value = {
@@ -175,3 +173,38 @@ def test_health_instance_block_null_when_markers_absent():
     inst = response.json()["instance"]
     assert inst["restarted_at"] is None
     assert inst["version_deployed_at"] is None
+
+
+@pytest.mark.asyncio
+async def test_interrupted_deploy_write_self_heals_on_next_boot(temp_db):
+    """A crash between the two deploy writes must not strand a stale timestamp.
+
+    `set_config` commits per call, so `version_deployed_at` and `deployed_version` land in
+    separate transactions. The timestamp is written first on purpose: if the process dies
+    in between, `deployed_version` still holds the OLD version, so the next boot sees a
+    mismatch and rewrites both. Written the other way round, the version guard would match
+    from then on and the stale timestamp would persist forever.
+    """
+    await set_config("deployed_version", "4.2.0", value_type="string")
+    await set_config("version_deployed_at", _PAST, value_type="string")
+
+    real_set_config = set_config
+    calls = []
+
+    async def crash_after_first_write(key, value, **kwargs):
+        calls.append(key)
+        if len(calls) > 1:  # first write lands, second one "crashes"
+            raise RuntimeError("process died mid-deploy")
+        return await real_set_config(key, value, **kwargs)
+
+    with patch("api.services.database.set_config", side_effect=crash_after_first_write):
+        with pytest.raises(RuntimeError):
+            await record_startup_markers("4.3.0")
+
+    # The version marker was NOT advanced, so the deploy is still pending...
+    assert (await get_config("deployed_version")).value == "4.2.0"
+
+    # ...and the next clean boot completes it.
+    await record_startup_markers("4.3.0")
+    assert (await get_config("deployed_version")).value == "4.3.0"
+    assert (await get_config("version_deployed_at")).value != _PAST

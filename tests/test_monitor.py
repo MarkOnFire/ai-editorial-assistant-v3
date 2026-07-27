@@ -5,7 +5,10 @@ dependency on ``rich`` (which the monitor imports lazily inside its renderers).
 """
 
 import json
+import sys
 from datetime import datetime, timedelta, timezone
+
+import pytest
 
 import scripts.monitor as monitor
 from scripts.monitor import Health, InstanceHealth, RawProbes, _fmt_ago, classify
@@ -389,3 +392,32 @@ async def test_probe_all_isolates_a_failing_instance(monkeypatch):
     assert fleet[0].verdict == Health.UP  # healthy instance unaffected
     assert fleet[1].verdict == Health.DOWN  # failing instance degraded, not fatal
     assert "boom" in fleet[1].notes[0]
+
+
+# --- CLI argument validation -------------------------------------------------
+
+
+@pytest.mark.parametrize("bad", ["0", "-5"])
+def test_watch_rejects_non_positive_interval(monkeypatch, capsys, bad):
+    """`--watch 0` used to be falsy and silently fell through to one-shot mode."""
+    monkeypatch.setattr(sys, "argv", ["monitor.py", "--watch", bad])
+    monkeypatch.setattr(monitor, "load_instances", lambda *a, **k: [])
+    with pytest.raises(SystemExit) as exc:
+        monitor.main()
+    assert exc.value.code == 2
+    assert "positive interval" in capsys.readouterr().err
+
+
+def test_watch_without_value_uses_default_interval(monkeypatch):
+    """Bare `--watch` still means "every 5s" and reaches the watch path, not one-shot."""
+    monkeypatch.setattr(sys, "argv", ["monitor.py", "--watch"])
+    monkeypatch.setattr(monitor, "load_instances", lambda *a, **k: [])
+    monkeypatch.setattr(monitor, "_rich_available", lambda: True)
+    seen = {}
+
+    async def fake_watch(instances, timeout, interval):
+        seen["interval"] = interval
+
+    monkeypatch.setattr(monitor, "run_watch", fake_watch)
+    monitor.main()
+    assert seen["interval"] == 5.0

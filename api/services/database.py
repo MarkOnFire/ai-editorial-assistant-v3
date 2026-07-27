@@ -1433,17 +1433,22 @@ async def record_startup_markers(version: str) -> None:
     )
     prev = await get_config("deployed_version")
     if prev is None or not prev.value or prev.value != version:
-        await set_config(
-            "deployed_version",
-            version,
-            value_type="string",
-            description="App version currently deployed to this instance",
-        )
+        # Order matters: `set_config` commits per call, so these two writes are separate
+        # transactions. Writing the timestamp FIRST makes a crash between them self-healing —
+        # `deployed_version` still holds the old version, so the next boot sees a mismatch and
+        # rewrites both. The reverse order would strand a stale `version_deployed_at`
+        # permanently, since the version guard would match from then on.
         await set_config(
             "version_deployed_at",
             now,
             value_type="string",
             description="UTC time the current app version was first seen (deploy marker)",
+        )
+        await set_config(
+            "deployed_version",
+            version,
+            value_type="string",
+            description="App version currently deployed to this instance",
         )
 
 
