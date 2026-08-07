@@ -22,11 +22,14 @@ from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
 
 from api.services import database
+from api.services.logging import get_logger
 from api.services.restart_signal import (
     get_restart_requested_at,
     request_restart,
     should_restart,
 )
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -164,9 +167,7 @@ async def watcher_heartbeat(body: Optional[WatcherHeartbeatRequest] = None):
         except ValueError:
             restart = False
 
-    return WatcherHeartbeatResponse(
-        success=True, message="Watcher heartbeat recorded", restart=restart
-    )
+    return WatcherHeartbeatResponse(success=True, message="Watcher heartbeat recorded", restart=restart)
 
 
 async def _self_restart(delay: float = 1.0) -> None:
@@ -195,6 +196,19 @@ async def restart_components(background_tasks: BackgroundTasks):
     watcher_age = await database.get_heartbeat_age_seconds("watcher")
     if database.heartbeat_is_fresh(watcher_age):
         components.append("watcher")
+
+    # Trace the cycle. This endpoint replaces machinery that claimed success
+    # while doing nothing (#304), so the request itself must leave a record --
+    # otherwise "did the restart actually happen?" is unanswerable after the
+    # fact, which is the same blind spot in a different place.
+    logger.info(
+        "Restart requested via Settings",
+        extra={
+            "event": "restart_requested",
+            "requested_at": requested_at,
+            "components": components,
+        },
+    )
 
     background_tasks.add_task(_self_restart)
     return RestartRequestResponse(
