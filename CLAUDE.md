@@ -243,8 +243,8 @@ See `docs/agents/issue-tracker.md`.
 
 The five canonical triage roles, used verbatim: `needs-triage`, `needs-info`,
 `ready-for-agent`, `ready-for-human`, `wontfix`. The repo's older
-`executor: *` pair is legacy and is being migrated off.
-See `docs/agents/triage-labels.md`.
+`executor: *` labels — `agent`, `human`, and `either` — are legacy and are
+being migrated off. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

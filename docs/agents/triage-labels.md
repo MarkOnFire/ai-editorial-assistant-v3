@@ -27,6 +27,12 @@ could go either way is simply `ready-for-agent` (an agent may take it) or
 `ready-for-human` (it needs judgment), so pick the one that reflects the actual
 routing decision rather than deferring it.
 
+**Expect this migration to look stalled, and don't read that as neglect.** Of
+109 open issues, 15 carry a legacy label: 7 `either`, 5 `human`, 3 `agent`. The
+largest slice is the one that *cannot* be renamed mechanically — by the rule
+above, each `either` has to be decided, not mapped. So a sweep clears 8 of 15
+and stops, leaving the hard half behind by design.
+
 The repo's other label families are orthogonal to triage and stay as they are:
 `type: *`, `priority: *`, `review: *`, `ship: *`, and topic labels
 (`infrastructure`, `container`, `python`, `tech-debt`, …).
