@@ -46,6 +46,10 @@ logs/
 .worktrees/
 .claude/worktrees/
 
+# Per-machine Claude Code overrides. `.claude/settings.json` is deliberately
+# NOT ignored — that one is the shared, committed project config.
+.claude/settings.local.json
+
 # Database snapshots — keep directory, ignore contents except gitkeep and the v2.1 archive
 .snapshots/*
 !.snapshots/.gitkeep
