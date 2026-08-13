@@ -1045,7 +1045,7 @@ export default function Settings() {
                       <div>
                         <div className="font-medium text-white">Transcript Watcher</div>
                         <div className="text-sm text-surface-400">
-                          {systemStatus?.watcher.running ? 'Running - Managed by Docker' : 'Not deployed'}
+                          {systemStatus?.watcher.running ? 'Running - Managed by Docker' : 'Not running - no recent heartbeat'}
                         </div>
                       </div>
                     </div>

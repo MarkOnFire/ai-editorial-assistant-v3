@@ -105,6 +105,43 @@ class TestWatcherHeartbeatEndpoint:
         assert response.json()["success"] is True
         mock_record.assert_awaited_once_with("watcher")
 
+    def test_naive_started_at_is_read_as_utc(self):
+        """An offset-less started_at still yields a restart, not a 500 or a false negative.
+
+        `datetime.fromisoformat` accepts a naive string happily; comparing it to
+        the aware `requested_at` used to raise TypeError, which `except ValueError`
+        did not catch.
+        """
+        requested = datetime(2026, 7, 16, 21, 0, tzinfo=timezone.utc)
+
+        with patch("api.routers.system.database.record_heartbeat", new_callable=AsyncMock), patch(
+            "api.routers.system.get_restart_requested_at",
+            new_callable=AsyncMock,
+            return_value=requested,
+        ):
+            response = client.post(
+                "/api/system/watcher/heartbeat",
+                json={"started_at": "2026-07-16T20:00:00"},
+            )
+
+        assert response.status_code == 200
+        assert response.json()["restart"] is True
+
+    def test_unparseable_started_at_degrades_to_no_restart(self):
+        """A malformed timestamp is best-effort: no restart, no 500."""
+        with patch("api.routers.system.database.record_heartbeat", new_callable=AsyncMock), patch(
+            "api.routers.system.get_restart_requested_at",
+            new_callable=AsyncMock,
+            return_value=datetime(2026, 7, 16, 21, 0, tzinfo=timezone.utc),
+        ):
+            response = client.post(
+                "/api/system/watcher/heartbeat",
+                json={"started_at": "not-a-timestamp"},
+            )
+
+        assert response.status_code == 200
+        assert response.json()["restart"] is False
+
 
 class TestHealthLLMSnapshot:
     """GET /api/system/health prefers the worker-published DB snapshot (#158)."""

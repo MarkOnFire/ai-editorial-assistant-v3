@@ -15,7 +15,7 @@ import asyncio
 import os
 import signal
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, BackgroundTasks
@@ -163,8 +163,14 @@ async def watcher_heartbeat(body: Optional[WatcherHeartbeatRequest] = None):
     if body is not None and body.started_at:
         try:
             started = datetime.fromisoformat(body.started_at)
+            # An offset-less timestamp parses fine but is naive, and comparing it
+            # against our aware `requested_at` raises TypeError. Read it as UTC
+            # rather than swallowing it: a caller that omits the offset should get
+            # the restart it asked for, not a silent `restart: false`.
+            if started.tzinfo is None:
+                started = started.replace(tzinfo=timezone.utc)
             restart = should_restart(started, await get_restart_requested_at())
-        except ValueError:
+        except (ValueError, TypeError):
             restart = False
 
     return WatcherHeartbeatResponse(success=True, message="Watcher heartbeat recorded", restart=restart)
