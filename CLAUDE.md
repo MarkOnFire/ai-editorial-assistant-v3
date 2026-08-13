@@ -231,3 +231,22 @@ PBS Wisconsin content editors who use Cardigan as one tool among many in their d
 4. **Don't break the API contract** - OpenAPI spec is the source of truth (once defined)
 5. **Log feedback** - Append issues to `AGENT-FEEDBACK.md` if created
 6. **NEVER write to Airtable** - Read-only access for all AI agents
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues on `public-media-work/cardigan` (via the `gh` CLI).
+See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles, used verbatim: `needs-triage`, `needs-info`,
+`ready-for-agent`, `ready-for-human`, `wontfix`. The repo's older
+`executor: *` labels — `agent`, `human`, and `either` — are legacy and are
+being migrated off. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — `CONTEXT.md` + `docs/adr/` at the repo root.
+See `docs/agents/domain.md`.
