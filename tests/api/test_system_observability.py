@@ -7,8 +7,11 @@ local process probes forced to "not found" (the prod/LXC shape).
 """
 
 import json
+import signal
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
@@ -102,6 +105,49 @@ class TestWatcherHeartbeatEndpoint:
         assert response.json()["success"] is True
         mock_record.assert_awaited_once_with("watcher")
 
+    def test_naive_started_at_is_read_as_utc(self):
+        """An offset-less started_at still yields a restart, not a 500 or a false negative.
+
+        `datetime.fromisoformat` accepts a naive string happily; comparing it to
+        the aware `requested_at` used to raise TypeError, which `except ValueError`
+        did not catch.
+        """
+        requested = datetime(2026, 7, 16, 21, 0, tzinfo=timezone.utc)
+
+        with (
+            patch("api.routers.system.database.record_heartbeat", new_callable=AsyncMock),
+            patch(
+                "api.routers.system.get_restart_requested_at",
+                new_callable=AsyncMock,
+                return_value=requested,
+            ),
+        ):
+            response = client.post(
+                "/api/system/watcher/heartbeat",
+                json={"started_at": "2026-07-16T20:00:00"},
+            )
+
+        assert response.status_code == 200
+        assert response.json()["restart"] is True
+
+    def test_unparseable_started_at_degrades_to_no_restart(self):
+        """A malformed timestamp is best-effort: no restart, no 500."""
+        with (
+            patch("api.routers.system.database.record_heartbeat", new_callable=AsyncMock),
+            patch(
+                "api.routers.system.get_restart_requested_at",
+                new_callable=AsyncMock,
+                return_value=datetime(2026, 7, 16, 21, 0, tzinfo=timezone.utc),
+            ),
+        ):
+            response = client.post(
+                "/api/system/watcher/heartbeat",
+                json={"started_at": "not-a-timestamp"},
+            )
+
+        assert response.status_code == 200
+        assert response.json()["restart"] is False
+
 
 class TestHealthLLMSnapshot:
     """GET /api/system/health prefers the worker-published DB snapshot (#158)."""
@@ -146,3 +192,99 @@ class TestHealthLLMSnapshot:
         assert data["last_run"] == {"cost": 0.1359}
         # config-derived fields still come from the in-process client
         assert data["llm"]["primary_backend"] == "openrouter"
+
+
+class TestRestartAction:
+    """POST /api/system/restart writes the signal, reports live components, schedules self-exit."""
+
+    def test_restart_writes_signal_and_reports_live_components(self):
+        with (
+            patch("api.routers.system._self_restart", new_callable=AsyncMock) as mock_self,
+            patch(
+                "api.routers.system.request_restart",
+                new_callable=AsyncMock,
+                return_value="2026-07-16T20:00:00+00:00",
+            ) as mock_req,
+            patch(
+                "api.routers.system.database.get_heartbeat_age_seconds",
+                new_callable=AsyncMock,
+            ) as mock_age,
+        ):
+            mock_age.side_effect = [5.0, None]  # worker fresh, watcher absent
+            response = client.post("/api/system/restart")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["requested_at"] == "2026-07-16T20:00:00+00:00"
+        assert data["components"] == ["api", "worker"]
+        mock_req.assert_awaited_once()
+        mock_self.assert_awaited_once()  # self-restart scheduled + run as a background task
+
+
+@pytest.mark.asyncio
+async def test_self_restart_sends_sigterm_to_self():
+    from api.routers.system import _self_restart
+
+    with (
+        patch("api.routers.system.asyncio.sleep", new_callable=AsyncMock),
+        patch("api.routers.system.os.kill") as mock_kill,
+        patch("api.routers.system.os.getpid", return_value=4321),
+    ):
+        await _self_restart()
+    mock_kill.assert_called_once_with(4321, signal.SIGTERM)
+
+
+class TestStatusContainerNames:
+    def test_status_reports_api_running_and_container_names(self):
+        with (
+            patch("api.routers.system._check_port_in_use", return_value=None),
+            patch("api.routers.system._find_process", return_value=None),
+            patch(
+                "api.routers.system.database.get_heartbeat_age_seconds",
+                new_callable=AsyncMock,
+            ) as mock_age,
+        ):
+            mock_age.side_effect = [None, None]
+            response = client.get("/api/system/status")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["api"]["running"] is True
+        assert data["api"]["container"] == "cardigan-api"
+        assert data["worker"]["container"] == "cardigan-worker"
+        assert data["watcher"]["container"] is None
+
+
+class TestWatcherHeartbeatRestart:
+    def test_heartbeat_returns_restart_true_when_signal_is_newer(self):
+        signal_time = datetime(2026, 7, 16, 20, 0, tzinfo=timezone.utc)
+        with patch(
+            "api.routers.system.get_restart_requested_at",
+            new_callable=AsyncMock,
+            return_value=signal_time,
+        ):
+            resp = client.post(
+                "/api/system/watcher/heartbeat",
+                json={"started_at": "2026-07-16T19:00:00+00:00"},  # started before signal
+            )
+        assert resp.status_code == 200
+        assert resp.json()["restart"] is True
+
+    def test_heartbeat_returns_restart_false_when_started_after_signal(self):
+        signal_time = datetime(2026, 7, 16, 20, 0, tzinfo=timezone.utc)
+        with patch(
+            "api.routers.system.get_restart_requested_at",
+            new_callable=AsyncMock,
+            return_value=signal_time,
+        ):
+            resp = client.post(
+                "/api/system/watcher/heartbeat",
+                json={"started_at": "2026-07-16T21:00:00+00:00"},  # started after signal
+            )
+        assert resp.status_code == 200
+        assert resp.json()["restart"] is False
+
+    def test_heartbeat_without_body_still_records_and_no_restart(self):
+        resp = client.post("/api/system/watcher/heartbeat")
+        assert resp.status_code == 200
+        assert resp.json()["restart"] is False
