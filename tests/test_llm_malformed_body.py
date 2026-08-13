@@ -16,12 +16,16 @@ Two behaviours are specified here:
    why the original body is unknown).
 2. ``chat()`` retries that transient failure a bounded number of times, and
    does not burn retries on errors that carry their own recovery semantics.
+
+Attempt counts assert on the ``_post_openrouter`` seam, not on
+``httpx.AsyncClient.post``. Patching the httpx class counts *every* POST in the
+process — on the success path Langfuse tracing adds one, so the count depended
+on whether ``LANGFUSE_*`` was set (it is in CI, and was not locally).
 """
 
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import httpx
 import pytest
 
 from api.services.llm import (
@@ -92,10 +96,11 @@ async def test_malformed_body_error_reports_body_length_and_prefix(llm_client, m
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     start_run_tracking(job_id=901)
 
-    with patch.object(httpx.AsyncClient, "post", return_value=_malformed_response()):
-        with patch("api.services.llm.log_event"):
-            with pytest.raises(MalformedResponseError) as excinfo:
-                await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
+    monkeypatch.setattr(llm_client, "_post_openrouter", AsyncMock(return_value=_malformed_response()))
+
+    with patch("api.services.llm.log_event"):
+        with pytest.raises(MalformedResponseError) as excinfo:
+            await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
 
     message = str(excinfo.value)
     assert "1610" in message, f"body length missing from diagnostics: {message}"
@@ -110,10 +115,10 @@ async def test_chat_retries_malformed_body_and_recovers(llm_client, monkeypatch,
     start_run_tracking(job_id=902)
 
     post = AsyncMock(side_effect=[_malformed_response(), _ok_response()])
+    monkeypatch.setattr(llm_client, "_post_openrouter", post)
 
-    with patch.object(httpx.AsyncClient, "post", post):
-        with patch("api.services.llm.log_event"):
-            response = await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
+    with patch("api.services.llm.log_event"):
+        response = await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
 
     assert response.content == "Recovered response"
     assert post.call_count == 2
@@ -126,11 +131,11 @@ async def test_chat_gives_up_after_bounded_attempts(llm_client, monkeypatch, _no
     start_run_tracking(job_id=903)
 
     post = AsyncMock(side_effect=lambda *a, **k: _malformed_response())
+    monkeypatch.setattr(llm_client, "_post_openrouter", post)
 
-    with patch.object(httpx.AsyncClient, "post", post):
-        with patch("api.services.llm.log_event"):
-            with pytest.raises(MalformedResponseError):
-                await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
+    with patch("api.services.llm.log_event"):
+        with pytest.raises(MalformedResponseError):
+            await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
 
     assert post.call_count == 3, f"expected 3 bounded attempts, got {post.call_count}"
 
@@ -147,10 +152,10 @@ async def test_credit_exhaustion_is_not_retried(llm_client, monkeypatch, _no_bac
     resp.json.return_value = {"error": {"message": "Insufficient credits"}}
 
     post = AsyncMock(return_value=resp)
+    monkeypatch.setattr(llm_client, "_post_openrouter", post)
 
-    with patch.object(httpx.AsyncClient, "post", post):
-        with patch("api.services.llm.log_event"):
-            with pytest.raises(CreditExhaustedError):
-                await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
+    with patch("api.services.llm.log_event"):
+        with pytest.raises(CreditExhaustedError):
+            await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
 
     assert post.call_count == 1, f"credit exhaustion retried {post.call_count} times"
