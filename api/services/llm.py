@@ -4,6 +4,7 @@ Provides unified interface for LLM API calls with cost tracking,
 model selection, and event logging.
 """
 
+import asyncio
 import json
 import os
 import re
@@ -18,6 +19,7 @@ import httpx
 from api.models.events import EventCreate, EventData, EventType
 from api.services.database import log_event
 from api.services.langfuse_client import get_langfuse_client
+from api.services.logging import get_logger
 from api.services.secrets import get_secret
 
 # Cost cap and safety configuration - can be overridden via environment
@@ -27,6 +29,26 @@ DEFAULT_MAX_COST_PER_1K_TOKENS = 0.05  # $0.05 per 1K tokens max
 # Model allowlist - if set, only these models are allowed
 # Empty list means all models allowed
 DEFAULT_MODEL_ALLOWLIST: List[str] = []
+
+logger = get_logger(__name__)
+
+# A success status carrying an unparseable body is transient upstream damage,
+# not a bad request — the identical call succeeds on retry. Bounded so a
+# genuinely broken backend still fails the phase instead of looping.
+#
+# These attempts share the caller's timeout: the worker wraps chat() in a single
+# asyncio.wait_for(timeout=backend.timeout). At the 300s the formatter backends
+# use, three ~70s attempts fit; on a 180s backend the last attempt may be cut
+# short and surface as a timeout instead. Diagnosis survives either way because
+# each malformed attempt is logged as it happens. Keep the backoff short so the
+# sleeps spend as little of that shared budget as possible.
+MALFORMED_BODY_MAX_ATTEMPTS = 3
+MALFORMED_BODY_BACKOFF_S = (1.0, 3.0)
+
+# How much of an unparseable body to quote in the error/log. Enough to tell
+# padding from a truncated payload or an HTML error page, short enough that a
+# multi-megabyte body cannot flood the logs.
+MALFORMED_BODY_PREFIX_CHARS = 300
 
 
 class CostCapExceededError(Exception):
@@ -62,6 +84,44 @@ class BackendUnavailableError(Exception):
         self.detail = detail
         self.backend = backend
         self.retry_after_s = retry_after_s
+
+
+class MalformedResponseError(Exception):
+    """A backend returned a success status with a body that is not valid JSON.
+
+    Seen in production as an HTTP 200 whose body was whitespace padding only:
+    the upstream held the connection open with keepalive padding, then ended it
+    without ever sending the payload. Transient — the identical request
+    succeeds on retry — so ``chat()`` retries this a bounded number of times.
+
+    Carries the body length and a bounded prefix, because a bare
+    ``json.JSONDecodeError`` reports only an offset and nothing logged the body.
+    """
+
+    def __init__(self, detail: str, *, backend: Optional[str] = None, body_length: Optional[int] = None):
+        super().__init__(detail)
+        self.detail = detail
+        self.backend = backend
+        self.body_length = body_length
+
+
+def _parse_json_body(response: "httpx.Response", *, backend: Optional[str], model: str) -> Dict[str, Any]:
+    """Parse a backend's response body, or raise a diagnosable error.
+
+    ``response.json()`` on its own reports an offset and nothing else, so a
+    malformed body left no way to tell padding from a truncated payload or an
+    HTML error page. Quote the body here — this is the only place that sees it.
+    """
+    try:
+        return response.json()
+    except ValueError as e:
+        body = response.text or ""
+        detail = (
+            f"{backend or 'backend'} returned HTTP {response.status_code} with a body that is not JSON "
+            f"(model={model}, {len(body)} chars, parse error: {e}). "
+            f"Body starts: {body[:MALFORMED_BODY_PREFIX_CHARS]!r}"
+        )
+        raise MalformedResponseError(detail, backend=backend, body_length=len(body)) from e
 
 
 class CreditExhaustedError(Exception):
@@ -652,16 +712,70 @@ class LLMClient:
 
         start_time = time.time()
 
-        if backend_type == "openrouter":
-            response = await self._call_openrouter(backend_config, model_id, messages, api_key, **kwargs)
-        elif backend_type == "openai":
-            response = await self._call_openai(backend_config, model_id, messages, api_key, **kwargs)
-        elif backend_type == "anthropic":
-            response = await self._call_anthropic(backend_config, model_id, messages, api_key, **kwargs)
-        elif backend_type == "gemini":
-            response = await self._call_gemini(backend_config, model_id, messages, api_key, **kwargs)
-        else:
+        async def _dispatch() -> LLMResponse:
+            if backend_type == "openrouter":
+                return await self._call_openrouter(backend_config, model_id, messages, api_key, **kwargs)
+            if backend_type == "openai":
+                return await self._call_openai(backend_config, model_id, messages, api_key, **kwargs)
+            if backend_type == "anthropic":
+                return await self._call_anthropic(backend_config, model_id, messages, api_key, **kwargs)
+            if backend_type == "gemini":
+                return await self._call_gemini(backend_config, model_id, messages, api_key, **kwargs)
             raise ValueError(f"Unsupported backend type: {backend_type}")
+
+        # A success status with an unparseable body is transient upstream damage.
+        # Retry it here rather than let it kill the phase: there is no retry
+        # anywhere above this (a chunk failure fails the whole job). Deliberately
+        # narrow — credit exhaustion, backend-unavailable and HTTP errors carry
+        # their own recovery semantics and must not burn attempts here.
+        for attempt in range(MALFORMED_BODY_MAX_ATTEMPTS):
+            try:
+                response = await _dispatch()
+                break
+            except MalformedResponseError as e:
+                if attempt == MALFORMED_BODY_MAX_ATTEMPTS - 1:
+                    logger.error(
+                        "Malformed response — giving up after %d attempts",
+                        MALFORMED_BODY_MAX_ATTEMPTS,
+                        extra={
+                            "job_id": job_id,
+                            "phase": phase,
+                            "backend": backend_name,
+                            "model": model_id,
+                            "attempts": MALFORMED_BODY_MAX_ATTEMPTS,
+                            "body_length": e.body_length,
+                            "detail": e.detail,
+                        },
+                    )
+                    raise
+
+                delay = MALFORMED_BODY_BACKOFF_S[min(attempt, len(MALFORMED_BODY_BACKOFF_S) - 1)]
+                # An unparseable body carries no usage block, so this attempt's
+                # spend cannot be added to the tracker — if the provider generated
+                # tokens before the body was lost, we are billed for them blind.
+                # Re-check the cap before spending again so a run that has already
+                # breached it (via other calls) stops here instead of paying for
+                # up to MALFORMED_BODY_MAX_ATTEMPTS more.
+                logger.warning(
+                    "Malformed response, retrying in %.1fs (attempt %d/%d) — this attempt's cost is untracked",
+                    delay,
+                    attempt + 1,
+                    MALFORMED_BODY_MAX_ATTEMPTS,
+                    extra={
+                        "job_id": job_id,
+                        "phase": phase,
+                        "backend": backend_name,
+                        "model": model_id,
+                        "attempt": attempt + 1,
+                        "max_attempts": MALFORMED_BODY_MAX_ATTEMPTS,
+                        "retry_in_s": delay,
+                        "body_length": e.body_length,
+                        "cost_tracked": False,
+                        "detail": e.detail,
+                    },
+                )
+                self.check_run_cost_cap()
+                await asyncio.sleep(delay)
 
         duration_ms = int((time.time() - start_time) * 1000)
         response.duration_ms = duration_ms
@@ -759,7 +873,7 @@ class LLMClient:
 
         response.raise_for_status()
 
-        data = response.json()
+        data = _parse_json_body(response, backend=self.active_backend, model=model)
 
         # Extract usage
         usage = data.get("usage", {})
@@ -851,7 +965,7 @@ class LLMClient:
 
         response.raise_for_status()
 
-        data = response.json()
+        data = _parse_json_body(response, backend=self.active_backend, model=model)
 
         usage = data.get("usage", {})
         input_tokens = usage.get("prompt_tokens", 0)
@@ -919,7 +1033,7 @@ class LLMClient:
         )
         response.raise_for_status()
 
-        data = response.json()
+        data = _parse_json_body(response, backend=self.active_backend, model=model)
 
         usage = data.get("usage", {})
         input_tokens = usage.get("input_tokens", 0)
@@ -979,7 +1093,7 @@ class LLMClient:
         )
         response.raise_for_status()
 
-        data = response.json()
+        data = _parse_json_body(response, backend=self.active_backend, model=model)
 
         # Extract usage metadata
         usage = data.get("usageMetadata", {})
