@@ -6,7 +6,6 @@ model selection, and event logging.
 
 import asyncio
 import json
-import logging
 import os
 import re
 import time
@@ -20,6 +19,7 @@ import httpx
 from api.models.events import EventCreate, EventData, EventType
 from api.services.database import log_event
 from api.services.langfuse_client import get_langfuse_client
+from api.services.logging import get_logger
 from api.services.secrets import get_secret
 
 # Cost cap and safety configuration - can be overridden via environment
@@ -30,7 +30,7 @@ DEFAULT_MAX_COST_PER_1K_TOKENS = 0.05  # $0.05 per 1K tokens max
 # Empty list means all models allowed
 DEFAULT_MODEL_ALLOWLIST: List[str] = []
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # A success status carrying an unparseable body is transient upstream damage,
 # not a bad request — the identical call succeeds on retry. Bounded so a
@@ -735,23 +735,46 @@ class LLMClient:
             except MalformedResponseError as e:
                 if attempt == MALFORMED_BODY_MAX_ATTEMPTS - 1:
                     logger.error(
-                        "Malformed response from %s after %d attempts — giving up: %s",
-                        backend_name,
+                        "Malformed response — giving up after %d attempts",
                         MALFORMED_BODY_MAX_ATTEMPTS,
-                        e.detail,
+                        extra={
+                            "job_id": job_id,
+                            "phase": phase,
+                            "backend": backend_name,
+                            "model": model_id,
+                            "attempts": MALFORMED_BODY_MAX_ATTEMPTS,
+                            "body_length": e.body_length,
+                            "detail": e.detail,
+                        },
                     )
                     raise
+
                 delay = MALFORMED_BODY_BACKOFF_S[min(attempt, len(MALFORMED_BODY_BACKOFF_S) - 1)]
+                # An unparseable body carries no usage block, so this attempt's
+                # spend cannot be added to the tracker — if the provider generated
+                # tokens before the body was lost, we are billed for them blind.
+                # Re-check the cap before spending again so a run that has already
+                # breached it (via other calls) stops here instead of paying for
+                # up to MALFORMED_BODY_MAX_ATTEMPTS more.
                 logger.warning(
-                    "Malformed response from %s (attempt %d/%d, phase=%s, job=%s), retrying in %.1fs: %s",
-                    backend_name,
+                    "Malformed response, retrying in %.1fs (attempt %d/%d) — this attempt's cost is untracked",
+                    delay,
                     attempt + 1,
                     MALFORMED_BODY_MAX_ATTEMPTS,
-                    phase,
-                    job_id,
-                    delay,
-                    e.detail,
+                    extra={
+                        "job_id": job_id,
+                        "phase": phase,
+                        "backend": backend_name,
+                        "model": model_id,
+                        "attempt": attempt + 1,
+                        "max_attempts": MALFORMED_BODY_MAX_ATTEMPTS,
+                        "retry_in_s": delay,
+                        "body_length": e.body_length,
+                        "cost_tracked": False,
+                        "detail": e.detail,
+                    },
                 )
+                self.check_run_cost_cap()
                 await asyncio.sleep(delay)
 
         duration_ms = int((time.time() - start_time) * 1000)

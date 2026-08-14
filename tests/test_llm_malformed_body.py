@@ -29,9 +29,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from api.services.llm import (
+    CostCapExceededError,
     CreditExhaustedError,
     LLMClient,
     MalformedResponseError,
+    get_run_tracker,
     start_run_tracking,
 )
 
@@ -159,3 +161,59 @@ async def test_credit_exhaustion_is_not_retried(llm_client, monkeypatch, _no_bac
             await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
 
     assert post.call_count == 1, f"credit exhaustion retried {post.call_count} times"
+
+
+@pytest.mark.asyncio
+async def test_retry_rechecks_cost_cap_between_attempts(llm_client, monkeypatch, _no_backoff):
+    """The run cost cap is re-checked before each retry, not only once up front.
+
+    A malformed body carries no usage data, so a discarded attempt's spend cannot
+    be added to the tracker — but the cap must still stop the loop from spending
+    more once the run has already breached it (e.g. via concurrent calls).
+    """
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    start_run_tracking(job_id=905)
+    llm_client.run_cost_cap = 1.0
+
+    def _breach_cap_then_fail(*args, **kwargs):
+        # Simulate the run crossing its cap while this attempt was in flight.
+        get_run_tracker().total_cost = 5.0
+        return _malformed_response()
+
+    post = AsyncMock(side_effect=_breach_cap_then_fail)
+    monkeypatch.setattr(llm_client, "_post_openrouter", post)
+
+    with patch("api.services.llm.log_event"):
+        with pytest.raises(CostCapExceededError):
+            await llm_client.chat(messages=[{"role": "user", "content": "Hello"}], backend="openrouter")
+
+    assert post.call_count == 1, f"kept spending past the cap: {post.call_count} attempts"
+
+
+@pytest.mark.asyncio
+async def test_retry_warning_carries_structured_fields(llm_client, monkeypatch, _no_backoff, caplog):
+    """job_id/phase ride in ``extra``, not interpolated into the message.
+
+    These lines exist to be read while diagnosing a job, so they must be
+    filterable the same way every other worker log line is.
+    """
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    start_run_tracking(job_id=906)
+
+    post = AsyncMock(side_effect=[_malformed_response(), _ok_response()])
+    monkeypatch.setattr(llm_client, "_post_openrouter", post)
+
+    with patch("api.services.llm.log_event"):
+        with caplog.at_level("WARNING", logger="api.services.llm"):
+            await llm_client.chat(
+                messages=[{"role": "user", "content": "Hello"}],
+                backend="openrouter",
+                job_id=906,
+                phase="formatter",
+            )
+
+    warnings = [r for r in caplog.records if r.levelname == "WARNING"]
+    assert warnings, "no retry warning emitted"
+    record = warnings[0]
+    assert getattr(record, "job_id", None) == 906
+    assert getattr(record, "phase", None) == "formatter"
