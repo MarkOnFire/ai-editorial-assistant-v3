@@ -61,3 +61,6 @@ api/_version.py
 
 # pip install -e . metadata — regenerated on every install
 *.egg-info/
+
+# Local dev instance data (prod job export + OUTPUT copy). Never commit.
+.devdata/
