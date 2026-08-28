@@ -637,7 +637,7 @@ class LLMClient:
     # user-driven retry (POST .../retry with an explicit model_override), so the
     # "cheapskate -> default -> big-brain" walk had no callers. Per-phase model
     # selection is now direct via the phase_models config (see _resolve_model in
-    # generate()). See planning/epic-l-consolidation-plan.md for the remaining
+    # generate()). See Epic L (#233) for the remaining
     # phase_backends -> phase_models consolidation.
 
     def get_api_key(self, backend_config: Dict[str, Any]) -> Optional[str]:

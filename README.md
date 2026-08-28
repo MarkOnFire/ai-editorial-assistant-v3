@@ -436,9 +436,9 @@ The GitHub Actions workflow (`ci.yml`) runs on pull requests to `main`:
 # Initialize session (loads context)
 ./init.sh
 
-# Check current progress
-cat planning/claude-progress.txt
-cat feature_list.json | jq '.[] | select(.status == "pending")'
+# Check the roadmap and pick up work
+gh issue list --repo public-media-work/cardigan --state open --label epic
+gh issue view <roadmap-issue>
 ```
 
 See [CLAUDE.md](CLAUDE.md) for AI development guidelines.
