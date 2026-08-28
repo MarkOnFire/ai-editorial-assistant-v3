@@ -48,7 +48,7 @@ else
     echo "  gh CLI not installed — see CLAUDE.md for the roadmap"
 fi
 echo ""
-echo "  Full roadmap: the pinned [Roadmap] issue"
+echo "  Full roadmap: gh issue view 357"
 echo "  Pick up work: gh issue list --state open --label ready-for-agent"
 
 echo ""

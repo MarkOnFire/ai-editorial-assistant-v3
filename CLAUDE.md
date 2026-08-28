@@ -118,7 +118,7 @@ editorial-assistant-v3/
 competing, perpetually-stale copies of the issue tracker and were removed. If you
 find yourself about to write a status document, put it in the issue instead.
 
-- **The roadmap** — the pinned `[Roadmap]` issue. Start here for orientation.
+- **The roadmap** — the pinned [Roadmap] issue #357. Start here for orientation.
 - **Epics** — `#222`–`#234`, one per work area, each with native sub-issues.
   Epic C (`#224`) is closed; the rest are open.
 - **Conventions** — `docs/agents/issue-tracker.md` (the `gh` recipes),

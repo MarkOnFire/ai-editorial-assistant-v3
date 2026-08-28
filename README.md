@@ -438,7 +438,7 @@ The GitHub Actions workflow (`ci.yml`) runs on pull requests to `main`:
 
 # Check the roadmap and pick up work
 gh issue list --repo public-media-work/cardigan --state open --label epic
-gh issue view <roadmap-issue>
+gh issue view 357
 ```
 
 See [CLAUDE.md](CLAUDE.md) for AI development guidelines.

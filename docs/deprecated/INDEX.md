@@ -88,5 +88,5 @@ home where ongoing analysis lives.
 
 - `cardigan-v4/data/judge_archive/README.md` — active analysis hub for
   legacy Langfuse findings
-- Epic issues #222–#234 — the canonical roadmap (see the pinned `[Roadmap]` issue)
+- Epic issues #222–#234 — the canonical roadmap (see the pinned Roadmap issue #357)
 - Open issues on `public-media-work/cardigan` with label `legacy-data`
