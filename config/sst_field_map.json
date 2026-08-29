@@ -1,0 +1,187 @@
+{
+  "$schema_version": "1.0",
+  "description": "Deliverable -> AirTable SST field mapping. Audit of what the pipeline emits, what AirTable can accept, and where the two fail to meet. Consumed by the item model (see the 'Define the item' ticket). Derived from code, not hand-maintained prose -- regenerate by re-auditing the sources listed in 'derived_from'.",
+  "airtable": {
+    "base_id": "appZ2HGwhiifQToB6",
+    "table_id": "tblTKFOwTvK7xw1H5",
+    "table_name": "Single Source of Truth"
+  },
+  "derived_from": [
+    "mcp_server/server.py :: WRITABLE_FIELDS (field ids are ground truth)",
+    "mcp_server/server.py :: _extract_sst_fields (the read surface)",
+    "config/house_style.yaml :: limits.fields (live limits; server.py holds a fallback copy)",
+    "prompts/{analyst,formatter,seo,timestamp}.md (producers)",
+    "api/services/worker.py :: PHASES / OPTIONAL_PHASES"
+  ],
+  "pipeline": {
+    "phases": ["analyst", "formatter", "seo", "validator"],
+    "optional_phases": ["timestamp"],
+    "optional_trigger": "timestamp runs automatically for content >= 10 minutes, or on request",
+    "excluded": ["copy_editor"]
+  },
+  "write_safety_classes": {
+    "generated": "Cardigan is the intended author. Overwrite is the normal case; per-record caution still applies when a human has reviewed the value.",
+    "human_authoritative": "The pipeline READS this field as ground truth. Writing it can degrade later runs. Must not be written without an explicit, reviewed decision.",
+    "no_producer": "On the write allowlist, but nothing in the pipeline generates it. Cannot be filled today.",
+    "read_only": "Never written. Context or provenance only.",
+    "unmapped": "The pipeline produces this, but no AirTable SST field accepts it."
+  },
+  "deliverables": [
+    {
+      "key": "title",
+      "category": "metadata",
+      "airtable_field": "Release Title",
+      "airtable_field_id": "fldXqxjjxR4z5IJv6",
+      "writable": true,
+      "limit": {"type": "chars", "max": 80},
+      "producer": {"phase": "seo", "section": "Title (Final Recommendation)"},
+      "write_safety": "generated",
+      "status": "ok"
+    },
+    {
+      "key": "short_description",
+      "category": "copy",
+      "airtable_field": "Short Description",
+      "airtable_field_id": "fldDwTtKlOCdgKHpW",
+      "writable": true,
+      "limit": {"type": "chars", "max": 90},
+      "producer": {"phase": "seo", "section": "Short Description (90 chars max)"},
+      "write_safety": "generated",
+      "status": "ok"
+    },
+    {
+      "key": "long_description",
+      "category": "copy",
+      "airtable_field": "Long Description",
+      "airtable_field_id": "fld6HsWiKL77bFqo1",
+      "writable": true,
+      "limit": {"type": "chars", "max": 350},
+      "producer": {"phase": "seo", "section": "Long Description (350 chars max)"},
+      "write_safety": "generated",
+      "status": "ok"
+    },
+    {
+      "key": "keywords",
+      "category": "metadata",
+      "airtable_field": "General Keywords/Tags",
+      "airtable_field_id": "fldjdPEXZyvx3rc6Y",
+      "writable": true,
+      "limit": {"type": "count", "min": 15, "max": 20, "override": {"short": {"min": 5, "max": 10}}},
+      "producer": {"phase": "seo", "section": "AMBIGUOUS -- see gap G1"},
+      "write_safety": "generated",
+      "status": "ambiguous_producer",
+      "note": "Two distinct 15-20 item lists compete for this one field: the flattened Keyword Strategy tiers (house_style.yaml line 330: 'Aim for 15-20 total keywords across the SEO Keywords section') and the separate 'YouTube Tags (15-20 recommended)' block. The prompt never says which one lands here."
+    },
+    {
+      "key": "hashtags",
+      "category": "metadata",
+      "airtable_field": "Hashtags",
+      "airtable_field_id": "fldYSGo5EBidQYL7W",
+      "writable": true,
+      "limit": {"type": "count", "min": 5, "max": 10, "source": "prompt only; no house_style limit"},
+      "producer": {"phase": "seo", "section": "Social Media Hashtags (5-10 recommended)"},
+      "write_safety": "generated",
+      "status": "ok"
+    },
+    {
+      "key": "social_description",
+      "category": "copy",
+      "airtable_field": "Social Media Description",
+      "airtable_field_id": "fldntHlzk6PfIT5k2",
+      "writable": true,
+      "limit": null,
+      "producer": null,
+      "write_safety": "human_authoritative",
+      "status": "hazard",
+      "note": "See gap G2. No producer emits this, AND both analyst.md and formatter.md read it as the authoritative source for episode speaker identification. It is writable today."
+    },
+    {
+      "key": "social_tags",
+      "category": "metadata",
+      "airtable_field": "Social Media Tags",
+      "airtable_field_id": "fldcenwfu4nEWjPbt",
+      "writable": true,
+      "limit": null,
+      "producer": null,
+      "write_safety": "no_producer",
+      "status": "no_producer"
+    },
+    {
+      "key": "facebook_description",
+      "category": "copy",
+      "airtable_field": "Facebook Description",
+      "airtable_field_id": "fldnprt2bJEsndv96",
+      "writable": true,
+      "limit": null,
+      "producer": null,
+      "write_safety": "no_producer",
+      "status": "no_producer"
+    }
+  ],
+  "unmapped_producers": [
+    {
+      "key": "formatted_transcript",
+      "category": "formatted_transcript",
+      "producer": {"phase": "formatter", "artifact": "formatter_output.md"},
+      "airtable_field": null,
+      "write_safety": "unmapped",
+      "status": "no_target",
+      "note": "The map's stage 5 expects a transcript LINK in a platform-notes field. No such field is referenced anywhere in the codebase. See gap G3."
+    },
+    {
+      "key": "chapters",
+      "category": "metadata",
+      "producer": {"phase": "timestamp", "artifact": "timestamp_output.md"},
+      "airtable_field": null,
+      "write_safety": "unmapped",
+      "status": "no_target",
+      "note": "Chapter timestamps are copy-pasted by editors into publishing platforms today. Destined for the same platform-notes field. See gap G3."
+    },
+    {
+      "key": "youtube_tags",
+      "category": "metadata",
+      "producer": {"phase": "seo", "section": "YouTube Tags (15-20 recommended)"},
+      "airtable_field": null,
+      "write_safety": "unmapped",
+      "status": "no_target",
+      "note": "Either this or the flattened keyword tiers belongs in General Keywords/Tags -- not both. See gap G1."
+    },
+    {
+      "key": "quality_score",
+      "category": "context",
+      "producer": {"phase": "seo", "section": "Quality Score"},
+      "airtable_field": null,
+      "write_safety": "read_only",
+      "status": "context_confirmed",
+      "note": "Internal QA signal. Genuinely has no SST target and should not acquire one."
+    }
+  ],
+  "context_layer": {
+    "note": "Reviewable, never published. Confirms question 2: these have no AirTable target by design.",
+    "analyst_output.md": [
+      "Summary", "Key Themes", "Speakers & Roles", "Structural Breakdown",
+      "Key Quotes & Moments", "SEO Keywords (Preliminary)", "Editorial Opportunities",
+      "Production Notes", "Review Items for Formatter"
+    ],
+    "seo_output.md": [
+      "Keyword Strategy tiers (Primary / Secondary / Long-Tail / Location)",
+      "Platform-Specific Recommendations", "SEMRush Integration",
+      "Accessibility & Inclusivity", "Next Steps"
+    ],
+    "validator_output.md": [
+      "Dissolving -- the map's standing decision replaces this with per-item status."
+    ]
+  },
+  "read_only_sst_context": {
+    "note": "Read by _extract_sst_fields for pipeline context. Never written.",
+    "fields": {
+      "media_id": "Media ID",
+      "program": "Batch-Episode",
+      "host": "Host",
+      "presenter": "Presenter",
+      "sd_status": "SD Character Count",
+      "ld_status": "LD Character Count",
+      "special_thanks": "Episode Special Thanks"
+    }
+  }
+}
