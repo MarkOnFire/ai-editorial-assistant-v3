@@ -13,7 +13,11 @@
     "mcp_server/server.py :: _extract_sst_fields (the read surface)",
     "config/house_style.yaml :: limits.fields (live limits; server.py holds a fallback copy)",
     "prompts/{analyst,formatter,seo,timestamp}.md (producers)",
-    "api/services/worker.py :: PHASES / OPTIONAL_PHASES"
+    "api/services/worker.py :: PHASES / OPTIONAL_PHASES",
+    "~/Developer/pbswi/automations/airtable/AIRTABLE_SAFETY.md (SST write policy, section 3 and 3a)",
+    "~/Developer/pbswi/automations/airtable/scripts/sst-batch-create.py (the existing Platform Notes writer)",
+    "~/Developer/pbswi/automations/airtable/scripts/sync_airtable_to_obsidian.py (owned-region marker precedent)",
+    "AirTable Meta API schema read of tblTKFOwTvK7xw1H5, 2026-08-28 (248 fields, read-only)"
   ],
   "pipeline": {
     "phases": [
@@ -288,7 +292,8 @@
       "end_marker": "--- CARDIGAN AUTO END ---",
       "on_write": "If both markers are present, replace only what lies between them. If absent, APPEND the block after existing content with one blank line of separation. Never touch bytes outside the markers.",
       "precedent": "Mirrors the AIRTABLE_SYNC_START/END owned-region convention in pbswi's sync_airtable_to_obsidian.py. Plain-text markers rather than HTML comments, because AirTable richText renders comments literally.",
-      "contents": "The chapter list, and the transcript link when one exists."
+      "contents": "The chapter list, and the transcript link when one exists.",
+      "single_writer": "Phases never write AirTable. The transcript link (formatter) and chapters (timestamp) have independent producers and would race for the same block if each wrote on completion -- the later write would erase the earlier one. The block is assembled and written ONCE by the publish step from current job state, so a re-publish rewrites it wholesale and is idempotent. Matches the map's stage 5: publish is a single universal action, not a per-phase side effect."
     },
     "blocking_governance": "pbswi issue #142 -- 'Confirm with Lisa: OK to use SST Platform Notes for automation metadata stamps?' -- has been OPEN and untouched since 2026-07-02. The existing automation stamp is itself provisional, pending the base owner's confirmation. Cardigan writing here would be a SECOND automation on a field whose automation use is not yet blessed."
   }

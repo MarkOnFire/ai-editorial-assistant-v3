@@ -119,6 +119,18 @@ Transcript: <link>
 - **Never** replace the field wholesale, and never write it from a value the client
   merely read earlier — a stale read-modify-write loses whatever a human typed in between.
 
+**One writer, not two.** The transcript link and the chapters have independent
+producers — `formatter` (required) and `timestamp` (optional, 10-minute threshold) —
+which would race for the same block if each wrote on completion: whichever finished
+second would replace the block and erase the other's contribution.
+
+So **phases never write AirTable.** The block is assembled and written **once, by the
+publish step**, from whatever approved items exist on the job at that moment. A job
+with no chapters (short content, `timestamp` never ran) simply publishes a block
+without a chapter list; adding chapters later is a re-publish, which rewrites the whole
+block from current job state and is therefore idempotent. This also matches the map's
+stage 5 — publish is a single universal action, not a per-phase side effect.
+
 This mirrors the `AIRTABLE_SYNC_START` / `AIRTABLE_SYNC_END` owned-region convention
 already used in pbswi's `sync_airtable_to_obsidian.py`. Plain-text markers rather than
 HTML comments, because AirTable `richText` renders comments literally.
@@ -153,8 +165,8 @@ Release Title, Short/Long Description, General Keywords/Tags, and Hashtags.
 
 | Producer | Phase | Why it can't publish |
 |---|---|---|
-| Formatted transcript | `formatter` | No target field (G3) |
-| Chapter timestamps | `timestamp` | No target field (G3) |
+| Formatted transcript | `formatter` | Target found — `Platform Notes`, but write is gated (G3, G5) |
+| Chapter timestamps | `timestamp` | Target found — `Platform Notes`, but write is gated (G3, G5) |
 | YouTube Tags | `seo` | Loses the G1 contest, or wins it and displaces the tiers |
 | Quality Score | `seo` | Correctly has no target — internal QA, not a deliverable |
 
@@ -168,7 +180,8 @@ output has nowhere to go in AirTable.
 - **5** deliverables are publishable end-to-end today.
 - **1** is a hazard to be removed from the allowlist (G2).
 - **2** are inert allowlist entries (`Social Media Tags`, `Facebook Description`).
-- **3** producers are stranded without a target (transcript, chapters, YouTube tags).
+- **1** producer is genuinely stranded with no target at all (YouTube Tags — and only because it loses the G1 contest).
+- **2** producers (transcript link, chapters) have a confirmed target in `Platform Notes`, blocked not by mapping but by authorization (G3, G5).
 - **1** producer (`Quality Score`) is correctly context-only.
 
 The item primitive — *proposed value, current AirTable value, status* — needs a
