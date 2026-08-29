@@ -175,23 +175,6 @@ output has nowhere to go in AirTable.
 
 ---
 
-## What this means for the item model
-
-- **5** deliverables are publishable end-to-end today.
-- **1** is a hazard to be removed from the allowlist (G2).
-- **2** are inert allowlist entries (`Social Media Tags`, `Facebook Description`).
-- **1** producer is genuinely stranded with no target at all (YouTube Tags — and only because it loses the G1 contest).
-- **2** producers (transcript link, chapters) have a confirmed target in `Platform Notes`, blocked not by mapping but by authorization (G3, G5).
-- **1** producer (`Quality Score`) is correctly context-only.
-
-The item primitive — *proposed value, current AirTable value, status* — needs a
-fourth axis these gaps expose: **whether the item can be published at all.** An item
-with no target field, or one whose field is human-authoritative, is not merely
-"not yet approved" — it is unpublishable, and the approval surface should say so
-rather than offering an approve button that silently does nothing.
-
----
-
 ## G5 — Cardigan bypasses the SST write-safety layer entirely
 
 Found while closing G3, and larger than the mapping question.
@@ -222,3 +205,20 @@ contract reserves for documented authorization. Worth resolving deliberately —
 either Cardigan adopts `airtable_writer.py` (gaining rollback and the allowlist), or
 the publish path gets its own documented authorization with an equivalent rollback
 trail. Either way it is a decision, not an implementation detail.
+
+---
+
+## What this means for the item model
+
+- **5** deliverables are publishable end-to-end today.
+- **1** is a hazard to be removed from the allowlist (G2).
+- **2** are inert allowlist entries (`Social Media Tags`, `Facebook Description`).
+- **1** producer is genuinely stranded with no target at all (YouTube Tags — and only because it loses the G1 contest).
+- **2** producers (transcript link, chapters) have a confirmed target in `Platform Notes`, blocked not by mapping but by authorization (G3, G5).
+- **1** producer (`Quality Score`) is correctly context-only.
+
+The item primitive — *proposed value, current AirTable value, status* — needs a
+fourth axis these gaps expose: **whether the item can be published at all.** An item
+with no target field, or one whose field is human-authoritative, is not merely
+"not yet approved" — it is unpublishable, and the approval surface should say so
+rather than offering an approve button that silently does nothing.
