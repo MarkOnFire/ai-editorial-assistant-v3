@@ -107,7 +107,7 @@ editorial-assistant-v3/
 ├── tests/                      # Test suite
 ├── docs/                       # Documentation
 │   ├── agents/                 # Issue tracker, triage labels, domain-doc rules
-│   └── adr/                    # Architecture decision records
+│   └── adr/                    # Architecture decision records (created lazily)
 └── standalone-agents/          # Out-of-pipeline agent POCs
 ```
 
@@ -170,7 +170,7 @@ Design docs live next to the code they describe, or in the epic that owns the wo
 
 - `docs/SYSTEM_RESTART_DESIGN.md` — system-components restart design (shipped)
 - `standalone-agents/youtube-copy-audit/FEATURE.md` — YouTube metadata POC scope
-- `docs/adr/` — architecture decision records
+- `docs/adr/` — architecture decision records (created lazily; none written yet)
 - Epic scope lives in the epic issue (e.g. Epic L `#233`, Epic M `#234`,
   Epic K `#232` for v5 hosting)
 
@@ -266,5 +266,7 @@ being migrated off. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context — `CONTEXT.md` + `docs/adr/` at the repo root.
+Single-context — `CONTEXT.md` + `docs/adr/` at the repo root. **Neither exists
+yet** — both are created lazily, when there is something worth recording. Don't go
+looking for them; write the first one when you have the first decision.
 See `docs/agents/domain.md`.
