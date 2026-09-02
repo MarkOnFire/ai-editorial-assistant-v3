@@ -122,3 +122,58 @@ class TestValidatorPromptExampleIsNotEchoed:
             "prompts/validator.md's example JSON contains the exact flag text that production "
             "jobs 31-36 reproduced near-verbatim. Use a neutral placeholder instead."
         )
+
+
+class TestDeterministicLintAgreesWithTheContract:
+    """The LLM checklist was not the only place the contract was contradicted.
+
+    ``check_review_notes_placement`` scans for a review-note marker after the
+    document's first horizontal rule, and its marker regex matches the bare
+    token ``NEEDS_REVIEW`` case-insensitively. But ``prompts/formatter.md``
+    REQUIRES a ``**Status:** {ready_for_editing | needs_review}`` footer, and
+    that footer sits after a closing ``---`` by contract -- so every
+    contract-compliant transcript that asks for human review trips the check.
+    """
+
+    def _formatter_doc(self, status: str) -> str:
+        return (
+            "# Formatted Transcript\n"
+            "**Project:** 2MSY0000HD\n\n"
+            "<!-- REVIEW NOTES:\n- Something the formatter could not verify\n-->\n\n"
+            "---\n\n"
+            "**Robert Reed:**  \nSome dialogue that ends properly.\n\n"
+            "---\n\n"
+            f"**Status:** {status}\n"
+        )
+
+    def _violations(self, doc: str):
+        from api.services.style_engine.review_notes import check_review_notes_placement
+
+        rules = load_rules(CONFIG_PATH)
+        cfg = (rules.raw.get("phases", {}).get("formatter", {}) or {}).get("review_notes") or {}
+        return check_review_notes_placement(doc, cfg, "formatter")
+
+    def test_ready_for_editing_footer_is_clean(self):
+        """Control: the same document shape with the other status value."""
+        assert self._violations(self._formatter_doc("ready_for_editing")) == []
+
+    def test_needs_review_status_footer_is_not_a_misplaced_review_note(self):
+        """The regression. `**Status:** needs_review` is the contract's own
+        footer, not a review note that drifted into the body.
+        """
+        found = self._violations(self._formatter_doc("needs_review"))
+        assert found == [], (
+            "check_review_notes_placement flags the mandatory `**Status:** needs_review` "
+            "footer as a review note in the transcript body. Production jobs 31, 32, 33, 35 "
+            f"and 36 all carry that footer by contract. Got: {[v.message for v in found]}"
+        )
+
+    def test_a_genuinely_misplaced_review_note_is_still_caught(self):
+        """Guard against fixing the false positive by gutting the check."""
+        doc = (
+            "# Formatted Transcript\n**Project:** X\n\n---\n\n"
+            "**Speaker:**  \nDialogue.\n\n"
+            "<!-- REVIEW NOTES: this one really is in the body -->\n\n"
+            "More dialogue.\n\n---\n\n**Status:** ready_for_editing\n"
+        )
+        assert self._violations(doc), "a review note inside the body must still be flagged"
