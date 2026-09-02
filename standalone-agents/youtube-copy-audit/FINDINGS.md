@@ -1,7 +1,7 @@
 # POC Findings Log
 
 Fill this in as you run the POC. These findings gate the full-feature build
-(`planning/YOUTUBE_METADATA_FEATURE.md`) — be specific and honest about
+(`standalone-agents/youtube-copy-audit/FEATURE.md`) — be specific and honest about
 friction.
 
 ---
