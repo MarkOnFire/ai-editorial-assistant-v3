@@ -383,13 +383,23 @@ prompt_blocks:
       - Output is structured and complete (not truncated)
 
       ### Formatter Phase
-      - No review notes, agent instructions, or metadata appear in the transcript body
+      - Review notes are a defect ONLY when inline among dialogue or appended at the end.
+      - A `<!-- REVIEW NOTES: ... -->` block immediately after the metadata header is required
+        by the formatter contract — never flag its placement or presence as a problem.
+      - The closing `**Status:**` footer is required contract structure, not stray metadata.
+      - `**Status:** needs_review` is not a validation failure — it is the formatter correctly
+        asking for a human check. Judge the transcript itself and pass it if it is sound.
+      - No agent instructions or scratch work appear in the transcript body
       - Speaker labels are consistent throughout (same speaker isn't labeled differently)
       - No content appears past the actual episode duration
       - Paragraphs and sections are properly formatted
       - No obvious truncation (content doesn't end abruptly mid-sentence)
 
       ### SEO Phase
+      Judge ONLY the final recommended value for each field. SEO reports often show their
+      revision history (e.g. a draft marked "109 characters — revision required" followed by a
+      corrected one); superseded drafts are working notes, not deliverables, and must never be
+      flagged. Sections the report marks "(Optional)" or leaves unfilled are not defects either.
       - Title is under 80 characters
       - Short description is under 90 characters
       - Long description is under 350 characters
