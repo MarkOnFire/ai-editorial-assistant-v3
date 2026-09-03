@@ -56,9 +56,7 @@ def check_review_notes_placement(raw_output: str, review_notes_cfg: Mapping | No
     if not hr_match:
         return []
 
-    after_first_rule = _STATUS_FOOTER_LINE_RE.sub(
-        lambda m: " " * len(m.group(0)), raw_output[hr_match.end() :]
-    )
+    after_first_rule = _STATUS_FOOTER_LINE_RE.sub(lambda m: " " * len(m.group(0)), raw_output[hr_match.end() :])
     marker_match = _REVIEW_NOTE_MARKER_RE.search(after_first_rule)
     if not marker_match:
         return []

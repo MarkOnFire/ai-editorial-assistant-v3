@@ -29,8 +29,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import pytest
-
 from api.services.style_engine.rules import load_rules
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -92,9 +90,9 @@ class TestFormatterContractIsNotContradicted:
             "production jobs 31, 32, 33, 35 and 36."
         )
         window = re.search(r"[^\n]*needs_review[^\n]*", checklist).group(0)
-        assert re.search(r"not a (validation )?failure|is not a fail|does not (by itself )?fail", window, re.I), (
-            f"validator.checklist.full mentions needs_review but never states it is not a failure: {window!r}"
-        )
+        assert re.search(
+            r"not a (validation )?failure|is not a fail|does not (by itself )?fail", window, re.I
+        ), f"validator.checklist.full mentions needs_review but never states it is not a failure: {window!r}"
 
 
 class TestSeoChecklistJudgesFinalValuesOnly:
