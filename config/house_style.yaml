@@ -409,9 +409,15 @@ prompt_blocks:
       ### Semantic accuracy
       - Title accurately reflects content
       - Description accurately reflects content
+
+      ### Factual consistency with SST (only when SST context is provided)
+      - Names, ensembles, organizations, dates and roles in the outputs are consistent with the SST context where it speaks to them
+      - Facts that appear in the SST context are grounded — do NOT flag them as fabricated merely because they are absent from the transcript or analyst output
+      - The formatter's **Program:** header matches the SST program when one is given (SST is authoritative)
     slim: |
       - Title accurately reflects content
       - Description accurately reflects content
+      - When SST context is provided: names, ensembles, dates and roles are consistent with it where it speaks to them; SST-sourced facts are grounded, not fabrications; SST is authoritative for the **Program:** header
 
       All mechanical checks (character limits, formatting, placeholders, truncation, speaker labels) run deterministically in the pipeline and are merged into your verdict — do NOT re-check them; judge only the semantic accuracy items above.
   "formatter.house_rules":
