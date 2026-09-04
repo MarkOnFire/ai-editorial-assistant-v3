@@ -33,13 +33,22 @@ import httpx
 import pytest
 
 from api.services.airtable import AirtableClient
-from api.services.worker import SST_CONTEXT_AIRTABLE_FIELDS, JobWorker
+from api.services.worker import (
+    SST_CONTEXT_AIRTABLE_FIELDS,
+    SST_CONTEXT_FIELD_MAP,
+    SST_PROJECT_FIELD_MAP,
+    JobWorker,
+)
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sst_schema_fields.json"
 
 
 def _snapshot_field_names() -> set[str]:
     return set(json.loads(FIXTURE.read_text())["field_names"])
+
+
+def _snapshot_projects_field_names() -> set[str]:
+    return set(json.loads(FIXTURE.read_text())["projects_field_names"])
 
 
 # ---------------------------------------------------------------------------
@@ -68,6 +77,16 @@ def test_sst_context_field_names_exist_in_schema():
     assert not missing, f"_fetch_sst_context reads fields not on the SST table: {sorted(missing)}"
 
 
+def test_project_field_names_exist_in_schema():
+    """Every field read off the linked Project record must exist there too.
+
+    Same defect class as #382, one table over — program identity comes from
+    the Projects table's 'Project Name' primary field.
+    """
+    missing = set(SST_PROJECT_FIELD_MAP.values()) - _snapshot_projects_field_names()
+    assert not missing, f"_fetch_sst_context reads fields not on the Projects table: {sorted(missing)}"
+
+
 @pytest.mark.skipif(
     os.environ.get("CARDIGAN_LIVE_AIRTABLE_TESTS") != "1",
     reason="live Airtable schema check; set CARDIGAN_LIVE_AIRTABLE_TESTS=1 to run",
@@ -84,13 +103,16 @@ def test_requested_field_names_exist_in_live_schema():
         timeout=30,
     )
     resp.raise_for_status()
-    tables = resp.json()["tables"]
-    sst = next(t for t in tables if t["id"] == AirtableClient.TABLE_ID)
-    live_names = {f["name"] for f in sst["fields"]}
+    tables = {t["id"]: t for t in resp.json()["tables"]}
+    live_sst = {f["name"] for f in tables[AirtableClient.TABLE_ID]["fields"]}
+    live_projects = {f["name"] for f in tables[AirtableClient.PROJECTS_TABLE_ID]["fields"]}
 
     requested = set(AirtableClient.SST_BATCH_FIELDS) | set(SST_CONTEXT_AIRTABLE_FIELDS)
-    missing = requested - live_names
+    missing = requested - live_sst
     assert not missing, f"code requests fields not on the live SST table: {sorted(missing)}"
+
+    missing_projects = set(SST_PROJECT_FIELD_MAP.values()) - live_projects
+    assert not missing_projects, f"code requests fields not on the live Projects table: {sorted(missing_projects)}"
 
 
 # ---------------------------------------------------------------------------
@@ -260,6 +282,26 @@ async def test_fetch_sst_context_maps_real_field_names():
     # 'Program' field), keyed off its primary field.
     assert ctx["program"] == "Madison Symphony at 100"
     assert ctx["project_notes"] == "Finale event of MSO's 100th anniversary season."
+    # Every schema-pinned mapping key must round-trip into the context when
+    # the record carries a value for it — this catches an inline literal
+    # drifting away from SST_CONTEXT_FIELD_MAP.
+    for key, field_name in SST_CONTEXT_FIELD_MAP.items():
+        if field_name in _SST_RECORD["fields"]:
+            assert ctx[key] == _SST_RECORD["fields"][field_name], key
+
+
+@pytest.mark.asyncio
+async def test_fetch_sst_context_title_falls_back_to_batch_episode():
+    """Pre-release records have no Release Title; Batch-Episode fills in."""
+    record = {
+        "id": "recWORKINGTITLE01",
+        "fields": {"Media ID": "2MSY0000HD", "Batch-Episode": "MSO Centennial (working)"},
+    }
+    client = _mock_airtable(search_result=record)
+    with patch("api.services.worker.get_airtable_client", return_value=client):
+        ctx = await _worker()._fetch_sst_context({"id": 40, "media_id": "2MSY0000HD"})
+
+    assert ctx["title"] == "MSO Centennial (working)"
 
 
 # ---------------------------------------------------------------------------
