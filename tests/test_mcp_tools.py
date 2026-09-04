@@ -442,6 +442,62 @@ async def test_propose_sst_edit_stages_in_manifest(project_with_manifest, monkey
 
 
 @pytest.mark.asyncio
+async def test_propose_sst_edit_rejects_code_fenced_value(project_with_manifest, monkeypatch):
+    """A proposed value carrying a code fence must be rejected (#380).
+
+    Pasted fences render invisibly in richText fields while corrupting the
+    first and last keywords — it happened twice to the same record.
+    """
+    from mcp_server.server import handle_propose_sst_edit
+
+    async def mock_search(media_id):
+        return {"record_id": "recTEST123", "keywords": "old, keywords"}
+
+    monkeypatch.setattr("mcp_server.server.search_sst_by_media_id", mock_search)
+
+    project_name, project_path = project_with_manifest
+    for bad_value in (
+        "```\nMadison Symphony Orchestra, classical music\n```",
+        "`Madison Symphony Orchestra, classical music`",
+        "```Madison Symphony Orchestra, classical music",
+    ):
+        result = await handle_propose_sst_edit(
+            {
+                "media_id": project_name,
+                "field": "keywords",
+                "proposed_value": bad_value,
+                "reason": "SEO refresh",
+            }
+        )
+        assert "backtick" in result[0].text.lower() or "fence" in result[0].text.lower(), bad_value
+
+    manifest = json.loads((project_path / "manifest.json").read_text())
+    assert "keywords" not in manifest.get("proposed_edits", {})
+
+
+@pytest.mark.asyncio
+async def test_propose_sst_edit_allows_interior_backticks(project_with_manifest, monkeypatch):
+    """Only leading/trailing backticks are paste artifacts; interior ones pass."""
+    from mcp_server.server import handle_propose_sst_edit
+
+    async def mock_search(media_id):
+        return {"record_id": "recTEST123", "long_description": "old"}
+
+    monkeypatch.setattr("mcp_server.server.search_sst_by_media_id", mock_search)
+
+    project_name, _ = project_with_manifest
+    result = await handle_propose_sst_edit(
+        {
+            "media_id": project_name,
+            "field": "long_description",
+            "proposed_value": "A look at the `pipeline` behind the music.",
+            "reason": "editorial",
+        }
+    )
+    assert "Proposed Edit" in result[0].text
+
+
+@pytest.mark.asyncio
 async def test_propose_sst_edit_rejects_disallowed_field(project_with_manifest, monkeypatch):
     """propose_sst_edit should reject fields not in the allowlist."""
     from mcp_server.server import handle_propose_sst_edit

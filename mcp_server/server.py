@@ -2050,6 +2050,25 @@ async def handle_propose_sst_edit(arguments: dict) -> list[TextContent]:
         allowed = ", ".join(sorted(WRITABLE_FIELDS.keys()))
         return [TextContent(type="text", text=f"Error: Field '{field}' is not writable. Allowed fields: {allowed}")]
 
+    # Reject paste artifacts: a value starting or ending with backticks is a
+    # Markdown code fence that came along with a copy/paste. In richText
+    # fields the fence renders invisibly while corrupting the first and last
+    # terms of the value (#380 — it happened twice to the same record).
+    stripped = proposed_value.strip()
+    if stripped.startswith("`") or stripped.endswith("`"):
+        return [
+            TextContent(
+                type="text",
+                text=(
+                    "Error: proposed_value starts or ends with a backtick — this is a "
+                    "Markdown code fence pasted along with the value, not part of it. "
+                    "In richText fields the fence renders invisibly while corrupting the "
+                    "first and last terms (#380). Strip the fence and propose the inner "
+                    "text only."
+                ),
+            )
+        ]
+
     airtable_column, field_id, char_limit = WRITABLE_FIELDS[field]
 
     # Fetch current value from Airtable
